@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contact &mdash; Chai Pe Charcha</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+.page-hero{padding:160px 80px 80px;text-align:center;position:relative;overflow:hidden;background:var(--bg2)}
+.page-hero::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,106,0,.12) 0%,transparent 65%);top:-100px;left:50%;transform:translateX(-50%)}
+.page-hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:900;margin-bottom:14px;position:relative}
+.page-hero p{color:var(--text-muted);font-size:1rem;position:relative;max-width:480px;margin:0 auto}
+
+.contact-wrap{padding:80px;background:var(--bg)}
+.contact-in{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.wa-btn{display:flex;align-items:center;gap:14px;background:#16a34a;color:#fff;padding:17px 30px;border-radius:99px;font-size:1.05rem;font-weight:700;margin-bottom:24px;transition:var(--ease);box-shadow:0 8px 28px rgba(22,163,74,.3);width:fit-content}
+.wa-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 36px rgba(22,163,74,.45);background:#15803d}
+.svc-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.svc-b{background:rgba(255,106,0,.1);color:var(--orange);border:1px solid var(--border);border-radius:99px;padding:7px 16px;font-weight:600;font-size:.8rem}
+.info-items{display:flex;flex-direction:column;gap:14px}
+.info-item{display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border2);transition:border-color var(--ease)}
+.info-item:hover{border-color:var(--border)}
+.info-ic{font-size:1.4rem;flex-shrink:0;margin-top:1px}
+.info-item strong{display:block;font-size:.85rem;font-weight:600;color:var(--cream);margin-bottom:2px}
+.info-item p{font-size:.8rem;color:var(--text-muted);line-height:1.5}
+
+.contact-form{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:36px}
+.contact-form h3{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:6px;color:var(--cream)}
+.contact-form .sub{color:var(--text-muted);font-size:.82rem;margin-bottom:26px}
+.fg{margin-bottom:18px}
+.fg label{display:block;font-size:.78rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;letter-spacing:.06em;text-transform:uppercase}
+.fg input,.fg textarea,.fg select{width:100%;padding:12px 16px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:'Inter',sans-serif;font-size:.9rem;background:var(--surface2);color:var(--cream);transition:border-color var(--ease),box-shadow var(--ease);outline:none;resize:vertical}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--text-muted)}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,106,0,.15)}
+.fg select option{background:var(--surface2)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+.faq{padding:80px;background:var(--bg2)}
+.faq-list{max-width:780px;margin:52px auto 0;display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);overflow:hidden;transition:border-color var(--ease)}
+.faq-item.open{border-color:var(--border)}
+.faq-q{width:100%;text-align:left;padding:18px 22px;font-weight:600;font-size:.92rem;color:var(--text-mid);background:none;display:flex;justify-content:space-between;align-items:center;transition:color var(--ease)}
+.faq-q:hover,.faq-item.open .faq-q{color:var(--cream)}
+.faq-ic{font-size:1.1rem;transition:transform var(--ease);opacity:.5;flex-shrink:0}
+.faq-item.open .faq-ic{transform:rotate(45deg);opacity:1}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.faq-item.open .faq-a{max-height:160px}
+.faq-a p{padding:0 22px 18px;font-size:.84rem;color:var(--text-muted);line-height:1.75}
+
+@media(max-width:900px){
+  .page-hero{padding:120px 24px 60px}
+  .contact-wrap,.faq{padding:60px 24px}
+  .contact-in{grid-template-columns:1fr;gap:40px}
+  .fg-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="pt-overlay"></div>
+<nav id="nav"><div class="nav-in">
+  <a href="home.html" class="nav-logo" data-pg><span class="logo-ic">&#9749;</span><span class="logo-text">Chai Pe Charcha</span></a>
+  <ul class="nav-links">
+    <li><a href="home.html" class="nl" data-pg>Home</a></li><li><a href="menu.html" class="nl" data-pg>Menu</a></li>
+    <li><a href="contact.html" class="nl" data-pg>Contact</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Toggle day/night mode" title="Toggle Day / Night Mode"><div class="theme-toggle-track"><span class="t-icon t-sun">&#9728;</span><span class="t-icon t-moon">&#9790;</span></div><div class="theme-toggle-knob"></div></button>
+<button class="hbg" id="hbg"><span></span><span></span><span></span></button>
+</div></nav>
+<div class="mob-menu" id="mob-menu">
+  <a href="home.html" class="mob-lnk" data-pg>Home</a><a href="menu.html" class="mob-lnk" data-pg>Menu</a>
+  <a href="contact.html" class="mob-lnk" data-pg>Contact</a>
+</div>
+
+<div class="page-hero">
+  <span class="lbl rev">Get in Touch</span>
+  <h1 class="rev" style="--d:.1s">Let's <span class="grad">Connect</span></h1>
+  <p class="rev" style="--d:.2s">We'd love to hear from you &mdash; or better yet, see you in person!</p>
+</div>
+
+<section class="contact-wrap">
+  <div class="contact-in">
+    <div class="rev left">
+      <a href="https://wa.me/923001234567" target="_blank" class="wa-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Chat on WhatsApp
+      </a>
+      <div class="svc-badges">
+        <span class="svc-b">&#127968; Dine-in</span><span class="svc-b">&#128666; Takeaway</span><span class="svc-b">&#128692; Delivery</span>
+      </div>
+      <div class="info-items">
+        <div class="info-item"><span class="info-ic">&#128205;</span><div><strong>Location</strong><p>Main Boulevard, Gulshan-e-Iqbal, Karachi</p></div></div>
+        <div class="info-item"><span class="info-ic">&#9200;</span><div><strong>Hours</strong><p>Monday &mdash; Sunday &middot; 7:00 AM &mdash; 12:00 AM</p></div></div>
+        <div class="info-item"><span class="info-ic">&#128222;</span><div><strong>Phone / WhatsApp</strong><p>+92 300 1234567</p></div></div>
+        <div class="info-item"><span class="info-ic">&#9993;</span><div><strong>Email</strong><p>hello@chaipecharcha.pk</p></div></div>
+      </div>
+    </div>
+    <form class="contact-form rev right" id="cform" onsubmit="handleSubmit(event)">
+      <h3>Send a Message</h3>
+      <p class="sub">We'll get back to you within a few hours</p>
+      <div class="fg-row">
+        <div class="fg"><label>Name</label><input type="text" id="uname" placeholder="Ahmed Khan" required/></div>
+        <div class="fg"><label>Phone</label><input type="tel" placeholder="+92 300 0000000"/></div>
+      </div>
+      <div class="fg">
+        <label>Subject</label>
+        <select>
+          <option>General Inquiry</option><option>Place an Order</option>
+          <option>Catering / Event</option><option>Feedback</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Message</label><textarea rows="5" placeholder="Tell us something..." required></textarea></div>
+      <button type="submit" class="btn btn-p btn-full" id="sbtn">
+        <span>Send Message</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="sec-hd rev"><span class="lbl">FAQ</span><h2 class="sec-title grad2">Common <span class="grad">Questions</span></h2></div>
+  <div class="faq-list">
+    <div class="faq-item rev" style="--d:.05s"><button class="faq-q" onclick="toggleFaq(this)">Do you offer home delivery? <span class="faq-ic">+</span></button><div class="faq-a"><p>Yes! We deliver within a 5km radius. Call or WhatsApp to order. Hot food at your door within 30 minutes, guaranteed.</p></div></div>
+    <div class="faq-item rev" style="--d:.1s"><button class="faq-q" onclick="toggleFaq(this)">Can I book for a group or event? <span class="faq-ic">+</span></button><div class="faq-a"><p>Absolutely! We accommodate group bookings and catering for office events, family gatherings, and parties. Contact us 2 days in advance.</p></div></div>
+    <div class="faq-item rev" style="--d:.15s"><button class="faq-q" onclick="toggleFaq(this)">What are your peak hours? <span class="faq-ic">+</span></button><div class="faq-a"><p>Busiest during evenings (6&ndash;9 PM) and early mornings (7&ndash;9 AM). Come off-peak for the most relaxed experience and fastest service.</p></div></div>
+    <div class="faq-item rev" style="--d:.2s"><button class="faq-q" onclick="toggleFaq(this)">Do you have sugar-free options? <span class="faq-ic">+</span></button><div class="faq-a"><p>Yes! Ask your server for less or no sugar. We also offer green tea and herbal options that are naturally light and healthy.</p></div></div>
+    <div class="faq-item rev" style="--d:.25s"><button class="faq-q" onclick="toggleFaq(this)">Is there parking available? <span class="faq-ic">+</span></button><div class="faq-a"><p>Yes, we have a small parking area in front. Street parking is also nearby. We're accessible by public transport too.</p></div></div>
+  </div>
+</section>
+
+<footer><div class="ft-in">
+  <div class="ft-brand"><div style="display:flex;align-items:center;gap:10px"><span class="logo-ic">&#9749;</span><span class="logo-text">Chai Pe Charcha</span></div><p>Where great food brings people together</p></div>
+  <div class="ft-links"><a href="home.html" data-pg>Home</a><a href="menu.html" data-pg>Menu</a><a href="contact.html" data-pg>Contact</a></div>
+  <p class="ft-copy">&copy; 2025 Chai Pe Charcha &middot; Made with &#10084; &amp; passion</p>
+</div></footer>
+<div class="toast" id="toast"></div>
+<script src="api.js"></script><script src="shared.js"></script>
+<script>
+function toggleFaq(btn){
+  const item=btn.closest('.faq-item'),open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!open)item.classList.add('open');
+}
+function handleSubmit(e){
+  e.preventDefault();
+  const name=document.getElementById('uname').value.trim();
+  const btn=document.getElementById('sbtn');
+  btn.innerHTML='<span>Message Sent &#10004;</span>';
+  btn.style.background='linear-gradient(135deg,#22c55e,#16a34a)';
+  btn.disabled=true;
+  showToast('Thanks '+name+"! We'll reply soon.");
+  setTimeout(()=>{
+    btn.innerHTML='<span>Send Message</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+    btn.style.background='';btn.disabled=false;
+    document.getElementById('cform').reset();
+  },3000);
+}
+</script>
+</body>
+</html>
+
+

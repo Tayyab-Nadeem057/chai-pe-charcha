@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Order Status &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&ldquo; Chai Pe Charcha</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:100px 24px 60px;background:var(--bg);position:relative}
+.glow{position:absolute;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,106,0,.08) 0%,transparent 65%);
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.card{width:100%;max-width:500px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:44px 40px;z-index:1;box-shadow:0 24px 80px rgba(0,0,0,.4);text-align:center}
+
+/* search */
+.search-row{display:flex;gap:10px;margin-bottom:32px}
+.search-row input{flex:1;padding:13px 16px;border:1px solid var(--border2);border-radius:var(--r-sm);
+  background:var(--bg2);color:var(--cream);font-family:'Inter',sans-serif;font-size:.92rem;
+  outline:none;transition:border-color var(--ease)}
+.search-row input::placeholder{color:var(--text-muted)}
+.search-row input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,106,0,.15)}
+.search-row button{padding:13px 20px;background:linear-gradient(135deg,var(--orange),#FFB347);
+  color:#fff;border-radius:var(--r-sm);font-weight:700;font-size:.88rem;border:none;cursor:pointer;transition:var(--ease)}
+.search-row button:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,106,0,.4)}
+
+/* states */
+.state-icon{font-size:4rem;margin-bottom:16px;display:block}
+.state-title{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;
+  color:var(--cream);margin-bottom:10px}
+.state-msg{font-size:.9rem;color:var(--text-muted);line-height:1.75;margin-bottom:28px}
+
+/* order summary box */
+.summary{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-sm);
+  padding:18px;margin-bottom:24px;text-align:left}
+.s-row{display:flex;justify-content:space-between;padding:7px 0;
+  border-bottom:1px solid var(--border2);font-size:.83rem}
+.s-row:last-child{border-bottom:none}
+.s-key{color:var(--text-muted)}.s-val{color:var(--cream);font-weight:600;text-align:right;max-width:260px}
+.s-val.orange{color:var(--orange)}
+
+/* pending dots */
+.dots{display:flex;gap:7px;justify-content:center;margin-bottom:20px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--orange);animation:db .9s ease infinite}
+.dot:nth-child(2){animation-delay:.18s}.dot:nth-child(3){animation-delay:.36s}
+@keyframes db{0%,80%,100%{transform:scale(.55);opacity:.35}40%{transform:scale(1);opacity:1}}
+
+/* 30-min countdown */
+.timer-wrap{background:rgba(255,106,0,.07);border:1px solid rgba(255,106,0,.2);
+  border-radius:var(--r-sm);padding:20px 24px;margin-bottom:24px}
+.timer-label{font-size:.72rem;color:var(--text-muted);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:8px}
+.timer-display{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;
+  color:var(--orange);letter-spacing:.04em;line-height:1}
+.timer-sub{font-size:.75rem;color:var(--text-muted);margin-top:6px}
+
+/* accepted ring */
+.ring{width:100px;height:100px;border-radius:50%;border:3px solid rgba(34,197,94,.3);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+  animation:rpulse 2.5s ease infinite}
+@keyframes rpulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.35)}
+  50%{box-shadow:0 0 0 18px rgba(34,197,94,0)}}
+
+/* rejected ring */
+.ring-red{border-color:rgba(239,68,68,.3);animation:rpulse-r 2.5s ease infinite}
+@keyframes rpulse-r{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.35)}
+  50%{box-shadow:0 0 0 18px rgba(239,68,68,0)}}
+
+/* action btns */
+.action-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 30px;
+  background:linear-gradient(135deg,var(--orange),#FFB347);color:#fff;border-radius:99px;
+  font-weight:700;font-size:.92rem;text-decoration:none;box-shadow:0 8px 28px rgba(255,106,0,.4);
+  transition:all .3s;border:none;cursor:pointer}
+.action-btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(255,106,0,.55)}
+.back-lnk{display:block;margin-top:16px;font-size:.8rem;color:var(--text-muted);
+  text-decoration:none;transition:color var(--ease)}
+.back-lnk:hover{color:var(--orange)}
+</style>
+</head>
+<body>
+<div class="pt-overlay"></div>
+<nav id="nav"><div class="nav-in">
+  <a href="home.html" class="nav-logo" data-pg><span class="logo-ic">&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#139;&#195;&#133;&#194;&#147;&rdquo;&#195;&#130;&#194;&#162;</span><span class="logo-text">Chai Pe Charcha</span></a>
+  <ul class="nav-links">
+    <li><a href="home.html" class="nl" data-pg>Home</a></li>
+    <li><a href="menu.html" class="nl" data-pg>Menu</a></li>
+    <li><a href="contact.html" class="nl" data-pg>Contact</a></li>
+  </ul>
+  <button class="hbg" id="hbg"><span></span><span></span><span></span></button>
+</div></nav>
+<div class="mob-menu" id="mob-menu">
+  <a href="home.html" class="mob-lnk" data-pg>Home</a><a href="menu.html" class="mob-lnk" data-pg>Menu</a>
+  <a href="contact.html" class="mob-lnk" data-pg>Contact</a>
+</div>
+
+<div class="wrap">
+  <div class="glow"></div>
+  <div class="card">
+    <div style="margin-bottom:28px">
+      <span class="lbl">Order Status</span>
+      <h1 style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;
+        margin-top:8px;color:var(--cream)">Check Your Order</h1>
+    </div>
+
+    <div class="search-row">
+      <input type="number" id="oid" placeholder="Enter your Order ID" min="1"/>
+      <button onclick="search()">Check &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#160;&apos;</button>
+    </div>
+
+    <div id="result"></div>
+    <a href="menu.html" class="back-lnk" data-pg>&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#160;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#144; Back to Menu</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="api.js"></script>
+<script src="shared.js"></script>
+<script>
+const BASE = "http://172.20.10.2:5000/api";
+let pollTimer  = null;
+let countdown  = null;
+let curId      = null;
+let lastStatus = null;
+
+// Auto-load from URL param or localStorage
+window.addEventListener('load', () => {
+  const id = new URLSearchParams(location.search).get('id')
+          || (JSON.parse(localStorage.getItem('last_order')||'null')||{}).id;
+  if (id) { document.getElementById('oid').value = id; fetchOrder(parseInt(id)); }
+});
+
+function search() {
+  const id = parseInt(document.getElementById('oid').value);
+  if (!id || id < 1) { showToast('Enter a valid Order ID'); return; }
+  fetchOrder(id);
+}
+
+async function fetchOrder(id) {
+  curId = id;
+  clearInterval(pollTimer);
+  clearInterval(countdown);
+  showLoading();
+  try {
+    const res  = await fetch(`${BASE}/orders/${id}`);
+    const json = await res.json();
+    if (!res.ok || !json.success) { showNotFound(); return; }
+    render(json.data);
+    // Keep polling only while Pending
+    if (json.data.status === 'Pending') {
+      pollTimer = setInterval(poll, 5000);
+    }
+  } catch(e) { showErr(); }
+}
+
+async function poll() {
+  try {
+    const res  = await fetch(`${BASE}/orders/${curId}`);
+    const json = await res.json();
+    if (!json.success) return;
+    if (json.data.status !== lastStatus) {
+      clearInterval(pollTimer);
+      render(json.data);
+      if (json.data.status === 'Accepted') notifyAccepted();
+      if (json.data.status === 'Rejected') notifyRejected();
+    }
+  } catch(e) {}
+}
+
+function render(order) {
+  lastStatus = order.status;
+  if      (order.status === 'Pending')  renderPending(order);
+  else if (order.status === 'Accepted') renderAccepted(order);
+  else                                   renderRejected(order);
+}
+
+// &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172; Pending &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;
+function renderPending(o) {
+  document.getElementById('result').innerHTML = `
+    <span class="state-icon">&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#139;&#195;&#133;&#194;&#147;&rdquo;&#195;&#130;&#194;&#162;</span>
+    <div class="state-title">We Received Your Order!</div>
+    <p class="state-msg">Your request is being reviewed by our team.<br/>
+    Please wait &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&rdquo;&#195;&#130;&#194;&#157; we'll update this page as soon as it's confirmed.</p>
+    ${orderSummary(o)}
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <p style="font-size:.75rem;color:var(--text-muted)">Checking for updates automatically...</p>
+  `;
+}
+
+// &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172; Accepted &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;
+function renderAccepted(o) {
+  const endTime = Date.now() + 30 * 60 * 1000;
+  document.getElementById('result').innerHTML = `
+    <div class="ring"><span style="font-size:2.6rem">&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#133;&#195;&#162;&#194;&#128;&#194;&#156;&rdquo;&#195;&#130;&#194;&#166;</span></div>
+    <div class="state-title" style="color:#86efac">Order Accepted!</div>
+    <p class="state-msg">Your order has been confirmed.<br/>
+    <strong style="color:var(--cream)">It will be delivered to you shortly.</strong> &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#176;&#195;&#131;&#194;&#133;&#195;&#130;&#194;&#184;&rdquo;&#195;&#130;&#194;&#186;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#181;</p>
+    ${orderSummary(o)}
+    <div class="timer-wrap">
+      <div class="timer-label">Estimated Delivery In</div>
+      <div class="timer-display" id="timer">30:00</div>
+      <div class="timer-sub">Your food is on the way!</div>
+    </div>
+    <a href="menu.html" class="action-btn" data-pg>&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#139;&#195;&#133;&#194;&#147;&rdquo;&#195;&#130;&#194;&#162; Order Again</a>
+  `;
+  startCountdown(endTime);
+}
+
+// &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172; Rejected &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;
+function renderRejected(o) {
+  document.getElementById('result').innerHTML = `
+    <div class="ring ring-red"><span style="font-size:2.6rem">&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#176;&#195;&#131;&#194;&#133;&#195;&#130;&#194;&#184;&#195;&#131;&#194;&#139;&#195;&#133;&#194;&#147;&rdquo;&#195;&#130;&#194;&#157;</span></div>
+    <div class="state-title" style="color:#fca5a5">Order Not Accepted</div>
+    <p class="state-msg">We're sorry, but we are unable to process your order at this time.<br/>
+    This could be due to high demand or delivery area limitations.<br/><br/>
+    <strong style="color:var(--cream)">Please try again or contact us directly.</strong></p>
+    ${orderSummary(o)}
+    <a href="menu.html" class="action-btn" data-pg>&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#176;&#195;&#131;&#194;&#133;&#195;&#130;&#194;&#184;&rdquo;&#195;&#130;&#194;&#157;&rdquo;&#195;&#133;&#194;&#190; Place New Order</a>
+    <div style="margin-top:14px;font-size:.8rem;color:var(--text-muted)">
+      Need help? Call us: <strong style="color:var(--orange)">+92 300 1234567</strong>
+    </div>
+  `;
+}
+
+// &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172; Countdown &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;
+function startCountdown(endTime) {
+  clearInterval(countdown);
+  function tick() {
+    const left = Math.max(0, endTime - Date.now());
+    const m = String(Math.floor(left / 60000)).padStart(2, '0');
+    const s = String(Math.floor((left % 60000) / 1000)).padStart(2, '0');
+    const el = document.getElementById('timer');
+    if (el) el.textContent = `${m}:${s}`;
+    if (left === 0) {
+      clearInterval(countdown);
+      if (el) { el.textContent = 'Arriving now!'; el.style.fontSize = '1.4rem'; }
+    }
+  }
+  tick();
+  countdown = setInterval(tick, 1000);
+}
+
+// &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172; Order summary &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;
+function orderSummary(o) {
+  return `<div class="summary">
+    <div class="s-row"><span class="s-key">Order #</span><span class="s-val">${o.id}</span></div>
+    <div class="s-row"><span class="s-key">Name</span><span class="s-val">${o.guest_name}</span></div>
+    <div class="s-row"><span class="s-key">Items</span>
+      <span class="s-val">${o.items.map(i=>`${i.item_name} &#195;&#131;&#194;&#131;&#195;&#134;&#194;&#146;&rdquo;&#195;&#162;&#194;&#128;&#194;&#157;${i.quantity}`).join(', ')}</span></div>
+    <div class="s-row"><span class="s-key">Total</span><span class="s-val orange">Rs. ${o.total_price}</span></div>
+    <div class="s-row"><span class="s-key">Address</span><span class="s-val">${o.delivery_address}</span></div>
+  </div>`;
+}
+
+// &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172; Utility states &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;
+function showLoading() {
+  document.getElementById('result').innerHTML = `
+    <span class="state-icon">&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#143;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#179;</span>
+    <div class="state-title">Looking up your order...</div>`;
+}
+function showNotFound() {
+  document.getElementById('result').innerHTML = `
+    <span class="state-icon">&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#176;&#195;&#131;&#194;&#133;&#195;&#130;&#194;&#184;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#141;</span>
+    <div class="state-title">Order Not Found</div>
+    <p class="state-msg">No order found with that ID.<br/>Please double-check your Order ID.</p>`;
+}
+function showErr() {
+  document.getElementById('result').innerHTML = `
+    <span class="state-icon">&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#133;&#195;&#130;&#194;&#161;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#160;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#175;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#184;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#143;</span>
+    <div class="state-title">Connection Error</div>
+    <p class="state-msg">Could not reach the server.<br/>Make sure the backend is running and try again.</p>`;
+}
+
+// &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172; Notifications &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;&#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&rdquo;&#195;&#130;&#194;&#157;&#195;&#131;&#194;&#162;&#195;&#162;&#194;&#128;&#194;&#154;&#195;&#130;&#194;&#172;
+function notifyAccepted() {
+  showToast('Your order has been Accepted! Delivering shortly &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#176;&#195;&#131;&#194;&#133;&#195;&#130;&#194;&#184;&rdquo;&#195;&#130;&#194;&#186;&#195;&#131;&#194;&#130;&#195;&#130;&#194;&#181;');
+  if ('Notification' in window && Notification.permission === 'granted')
+    new Notification('Order Accepted! &#195;&#131;&#194;&#131;&#195;&#130;&#194;&#162;&#195;&#131;&#194;&#139;&#195;&#133;&#194;&#147;&rdquo;&#195;&#130;&#194;&#162;', { body: 'Your chai is on the way. Estimated 30 minutes!' });
+}
+function notifyRejected() {
+  showToast('Sorry, your order could not be processed.');
+}
+
+if ('Notification' in window && Notification.permission === 'default')
+  Notification.requestPermission();
+</script>
+</body>
+</html>
+

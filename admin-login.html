@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Login &mdash; Chai Pe Charcha</title>
+<meta name="robots" content="noindex,nofollow"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#0D0500;font-family:'Inter',sans-serif;padding:24px;position:relative;overflow:hidden}
+#c{position:absolute;inset:0;pointer-events:none}
+.glow{position:absolute;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,106,0,.12) 0%,transparent 65%);
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.card{width:100%;max-width:420px;background:#1C0C04;border:1px solid rgba(255,106,0,.18);
+  border-radius:18px;padding:44px 40px;position:relative;z-index:1;
+  box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.logo{text-align:center;margin-bottom:32px}
+.logo-ic{font-size:2.4rem;filter:drop-shadow(0 0 16px rgba(255,106,0,.5))}
+.logo h1{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:#FFF5E4;margin-top:10px}
+.logo p{font-size:.78rem;color:#7A5C3A;margin-top:5px;letter-spacing:.06em;text-transform:uppercase}
+.warn-badge{display:flex;align-items:center;gap:8px;background:rgba(255,106,0,.08);
+  border:1px solid rgba(255,106,0,.2);border-radius:10px;padding:10px 14px;
+  margin-bottom:24px;font-size:.78rem;color:#FFB347}
+.warn-badge span{font-size:1rem}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:.72rem;font-weight:600;color:#7A5C3A;
+  margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase}
+.fg input{width:100%;padding:13px 16px;border:1px solid rgba(255,106,0,.15);
+  border-radius:10px;background:#130800;color:#FFF5E4;font-family:'Inter',sans-serif;
+  font-size:.92rem;outline:none;transition:border-color .3s,box-shadow .3s}
+.fg input::placeholder{color:#4A3020}
+.fg input:focus{border-color:#FF6A00;box-shadow:0 0 0 3px rgba(255,106,0,.15)}
+.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);
+  color:#fca5a5;padding:11px 14px;border-radius:10px;font-size:.82rem;
+  margin-bottom:14px;display:none}
+.err.show{display:block}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,#FF6A00,#FFB347);
+  color:#fff;border:none;border-radius:99px;font-family:'Inter',sans-serif;
+  font-size:.95rem;font-weight:700;cursor:pointer;transition:all .3s;margin-top:4px;
+  box-shadow:0 6px 24px rgba(255,106,0,.35)}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px rgba(255,106,0,.5)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.back-link{text-align:center;margin-top:20px;font-size:.75rem;color:#4A3020}
+.back-link a{color:#FF6A00;text-decoration:none}
+.back-link a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="glow"></div>
+<div class="card">
+  <div class="logo">
+    <div class="logo-ic">&#9749;</div>
+    <h1>Admin Panel</h1>
+    <p>Chai Pe Charcha &mdash; Restricted Access</p>
+  </div>
+  <div class="warn-badge"><span>&#9888;</span> This page is for authorized staff only</div>
+  <div class="err" id="err"></div>
+  <form onsubmit="doLogin(event)">
+    <div class="fg"><label>Admin Phone</label><input type="tel" id="phone" placeholder="03001234567" required autofocus/></div>
+    <div class="fg"><label>Password</label><input type="password" id="pass" placeholder="Enter your password" required/></div>
+    <button type="submit" class="btn" id="sbtn">Access Admin Panel</button>
+  </form>
+  <div class="back-link"><a href="home.html">&larr; Back to Website</a></div>
+</div>
+
+<script>
+const API = "http://localhost:5000/api";
+
+if (localStorage.getItem("admin_token")) {
+  window.location.href = "admin-panel.html";
+}
+
+// Canvas sparks
+(function(){
+  const c=document.getElementById('c'),ctx=c.getContext('2d');
+  let W,H,sparks=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<100;i++) sparks.push({x:Math.random()*1920,y:Math.random()*1080,r:Math.random()*1.4+.2,vx:(Math.random()-.5)*.2,vy:-Math.random()*.3-.05,a:Math.random()*.35+.05});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    sparks.forEach(s=>{
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,${100+Math.random()*60|0},0,${s.a})`;ctx.fill();
+      s.x+=s.vx;s.y+=s.vy;
+      if(s.y<-5){s.y=H+5;s.x=Math.random()*W}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+async function doLogin(e) {
+  e.preventDefault();
+  const err  = document.getElementById('err');
+  const btn  = document.getElementById('sbtn');
+  const phone = document.getElementById('phone').value.trim();
+  const pass  = document.getElementById('pass').value;
+  err.classList.remove('show');
+  btn.textContent = 'Verifying...'; btn.disabled = true;
+
+  try {
+    const res = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, password: pass })
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) throw new Error(json.message || 'Login failed');
+    if (json.data.user.role !== 'admin') throw new Error('Access denied. Admin accounts only.');
+
+    localStorage.setItem('admin_token', json.data.token);
+    localStorage.setItem('admin_user',  JSON.stringify(json.data.user));
+    window.location.href = 'admin-panel.html';
+  } catch(ex) {
+    err.textContent = ex.message;
+    err.classList.add('show');
+    btn.textContent = 'Access Admin Panel'; btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
