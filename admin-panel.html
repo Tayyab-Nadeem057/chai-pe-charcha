@@ -1,268 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Admin Panel &mdash; Chai Pe Charcha</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Panel — Chai Pe Charcha</title>
 <meta name="robots" content="noindex,nofollow"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{background:#0D0500;color:#FFF5E4;font-family:'Inter',sans-serif;min-height:100vh}
-a{text-decoration:none;color:inherit}
-/* SIDEBAR */
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:#130800;
-  border-right:1px solid rgba(255,106,0,.12);display:flex;flex-direction:column;z-index:100}
-.sb-logo{padding:28px 24px;border-bottom:1px solid rgba(255,106,0,.1)}
-.sb-logo h2{font-family:'Playfair Display',serif;font-size:1.1rem;color:#FFF5E4;display:flex;align-items:center;gap:8px}
-.sb-logo p{font-size:.7rem;color:#7A5C3A;margin-top:2px;letter-spacing:.06em;text-transform:uppercase}
-.sb-nav{flex:1;padding:16px 0}
-.sb-item{display:flex;align-items:center;gap:12px;padding:13px 24px;font-size:.86rem;
-  color:#7A5C3A;cursor:pointer;transition:all .25s;border-left:3px solid transparent}
-.sb-item:hover{background:rgba(255,106,0,.06);color:#FFF5E4}
-.sb-item.act{background:rgba(255,106,0,.1);color:#FF6A00;border-left-color:#FF6A00}
-.sb-ic{font-size:1.1rem;width:20px;text-align:center}
-.sb-foot{padding:20px 24px;border-top:1px solid rgba(255,106,0,.1)}
-.sb-admin{font-size:.82rem;color:#C8A882;margin-bottom:10px}
-.sb-admin strong{display:block;color:#FFF5E4;font-size:.88rem}
-.logout-btn{width:100%;padding:9px;background:rgba(255,106,0,.1);color:#FF6A00;
-  border:1px solid rgba(255,106,0,.2);border-radius:8px;font-size:.8rem;
-  font-weight:600;cursor:pointer;transition:all .25s}
-.logout-btn:hover{background:#FF6A00;color:#fff}
-/* MAIN */
-.main{margin-left:240px;padding:36px 40px;min-height:100vh}
-.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:14px}
-.top-bar h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900}
-.refresh-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;background:#1C0C04;
-  border:1px solid rgba(255,106,0,.2);border-radius:8px;color:#FF6A00;font-size:.82rem;
-  font-weight:600;cursor:pointer;transition:all .25s}
-.refresh-btn:hover{background:rgba(255,106,0,.1)}
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
-.sc{background:#1C0C04;border:1px solid rgba(255,106,0,.1);border-radius:14px;padding:22px}
-.sc-val{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;line-height:1;margin-bottom:6px}
-.sc-val.o{color:#FF6A00}.sc-val.y{color:#fbbf24}.sc-val.g{color:#22c55e}.sc-val.r{color:#ef4444}
-.sc-label{font-size:.72rem;color:#7A5C3A;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
-/* FILTER */
-.section-hd{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-.section-hd h2{font-family:'Playfair Display',serif;font-size:1.25rem;flex:1;color:#FFF5E4}
-/* TABLE */
-.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid rgba(255,106,0,.1)}
-table{width:100%;border-collapse:collapse;background:#1C0C04}
-th{text-align:left;font-size:.68rem;font-weight:600;color:#7A5C3A;letter-spacing:.1em;
-  text-transform:uppercase;padding:13px 16px;border-bottom:1px solid rgba(255,106,0,.1);white-space:nowrap}
-td{padding:14px 16px;border-bottom:1px solid rgba(255,106,0,.06);font-size:.85rem;color:#C8A882;vertical-align:top}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,106,0,.03)}
-.oid{font-family:'Playfair Display',serif;font-weight:900;font-size:1.05rem;color:#FF6A00}
-.cust-name{font-weight:600;color:#FFF5E4;font-size:.88rem}
-.cust-phone{font-size:.75rem;color:#7A5C3A;margin-top:2px}
-.items-cell{font-size:.8rem;color:#C8A882;line-height:1.7}
-.items-cell .qty{color:#7A5C3A;font-size:.72rem}
-.price-cell{font-weight:700;color:#FFF5E4;white-space:nowrap}
-.addr-cell{font-size:.78rem;color:#7A5C3A;max-width:160px;line-height:1.4}
-.ts-cell{font-size:.72rem;color:#7A5C3A;white-space:nowrap}
-/* Status pills */
-.sp{padding:4px 12px;border-radius:99px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-.sp-Pending{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
-.sp-Accepted{background:rgba(34,197,94,.1);color:#86efac;border:1px solid rgba(34,197,94,.25)}
-.sp-Rejected{background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
-/* Action buttons */
-.act-wrap{display:flex;gap:6px;flex-wrap:wrap}
-.ab{padding:6px 14px;border-radius:99px;font-size:.7rem;font-weight:600;cursor:pointer;transition:all .25s;border:none}
-.ab-acc{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25)}
-.ab-acc:hover{background:#22c55e;color:#fff}
-.ab-rej{background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.22)}
-.ab-rej:hover{background:#ef4444;color:#fff}
-.ab-dis{opacity:.35;pointer-events:none}
-/* Empty / loading */
-.no-data{text-align:center;padding:56px;color:#7A5C3A;font-size:.9rem}
-/* Toast */
-.toast{position:fixed;bottom:28px;right:28px;background:#251005;color:#FFF5E4;
-  padding:13px 22px;border-radius:12px;font-size:.88rem;border-left:3px solid #FF6A00;
-  box-shadow:0 8px 40px rgba(0,0,0,.5);transform:translateY(60px);opacity:0;
-  pointer-events:none;transition:all .35s;z-index:9999}
-.toast.show{transform:translateY(0);opacity:1}
-/* Auto-refresh indicator */
-.auto-badge{font-size:.68rem;color:#7A5C3A;letter-spacing:.04em;display:flex;align-items:center;gap:5px}
-.auto-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-@media(max-width:900px){
-  .sidebar{width:200px}.main{margin-left:200px;padding:24px 20px}
-  .stats{grid-template-columns:1fr 1fr}
-  th:nth-child(5),td:nth-child(5),th:nth-child(7),td:nth-child(7){display:none}
-}
-@media(max-width:640px){.sidebar{display:none}.main{margin-left:0}}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="admin.css"/>
 </head>
 <body>
 
-<!-- SIDEBAR -->
+<button type="button" class="mob-nav-btn" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+
 <aside class="sidebar">
-  <div class="sb-logo">
-    <h2>&#9749; Chai Pe Charcha</h2>
-    <p>Admin Panel</p>
-  </div>
+  <div class="sb-logo"><h2>&#9749; Chai Pe Charcha</h2><p>Admin Panel</p></div>
   <nav class="sb-nav">
     <div class="sb-item act" onclick="showView('orders',this)"><span class="sb-ic">&#128203;</span> All Orders</div>
     <div class="sb-item" onclick="showView('pending',this)"><span class="sb-ic">&#9203;</span> Pending</div>
-    <div class="sb-item" onclick="showView('accepted',this)"><span class="sb-ic">&#10004;</span> Accepted</div>
-    <div class="sb-item" onclick="showView('rejected',this)"><span class="sb-ic">&#10008;</span> Rejected</div>
+    <div class="sb-item" onclick="showView('menu',this)"><span class="sb-ic">&#127869;</span> Menu Items</div>
   </nav>
   <div class="sb-foot">
-    <div class="sb-admin"><span style="color:#7A5C3A">Logged in as</span><strong id="admin-name">Admin</strong></div>
-    <button class="logout-btn" onclick="doLogout()">&#128682; Logout</button>
+    <div class="sb-admin"><span>Logged in as</span><strong id="admin-name">Admin</strong></div>
+    <button type="button" class="logout-btn" onclick="doLogout()">Logout</button>
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
   <div class="top-bar">
     <div>
-      <h1 id="page-title">All Orders</h1>
-      <div class="auto-badge"><div class="auto-dot"></div> Auto-refreshes every 30s</div>
+      <h1 id="page-title">Orders</h1>
+      <div class="auto-badge"><span class="auto-dot"></span> Auto-refresh 30s</div>
     </div>
-    <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh Now</button>
+    <button type="button" class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
   </div>
 
-  <!-- Stats row -->
   <div class="stats">
-    <div class="sc"><div class="sc-val o" id="s-total">—</div><div class="sc-label">Total Orders</div></div>
+    <div class="sc"><div class="sc-val o" id="s-total">—</div><div class="sc-label">Orders</div></div>
     <div class="sc"><div class="sc-val y" id="s-pending">—</div><div class="sc-label">Pending</div></div>
     <div class="sc"><div class="sc-val g" id="s-accepted">—</div><div class="sc-label">Accepted</div></div>
     <div class="sc"><div class="sc-val r" id="s-rejected">—</div><div class="sc-label">Rejected</div></div>
   </div>
 
-  <!-- Orders table -->
-  <div class="section-hd">
-    <h2 id="table-title">All Orders</h2>
+  <div id="view-orders" class="view-panel act">
+    <div id="tbl-container" class="tbl-wrap"><div class="no-data">Loading…</div></div>
   </div>
-  <div class="tbl-wrap">
-    <div id="tbl-container"><div class="no-data">Loading orders...</div></div>
+
+  <div id="view-pending" class="view-panel"></div>
+  <div id="view-accepted" class="view-panel"></div>
+  <div id="view-rejected" class="view-panel"></div>
+
+  <div id="view-menu" class="view-panel">
+    <div class="menu-toolbar">
+      <input type="search" id="menu-search" placeholder="Search items…" oninput="loadMenuAdmin()"/>
+      <select id="menu-cat-filter" onchange="loadMenuAdmin()"><option value="">All categories</option></select>
+      <select id="menu-svc-filter" onchange="loadMenuAdmin()">
+        <option value="">All services</option>
+        <option value="dinein">Dine In</option>
+        <option value="takeaway">Take Away</option>
+        <option value="delivery">Delivery</option>
+      </select>
+      <select id="menu-active-filter" onchange="loadMenuAdmin()">
+        <option value="">All status</option>
+        <option value="1">Active only</option>
+        <option value="0">Hidden only</option>
+      </select>
+      <button type="button" class="btn-add" onclick="openItemForm()">+ Add Item</button>
+    </div>
+    <p class="hint">Changes save to the database and appear on the website immediately.</p>
+    <div id="menu-list" class="menu-grid"></div>
   </div>
 </main>
 
+<div id="item-modal" class="modal">
+  <div class="modal-box">
+    <h2 id="modal-title">Edit Item</h2>
+    <form onsubmit="saveItem(event)">
+      <input type="hidden" id="mf-id"/>
+      <label>Name<input id="mf-name" required/></label>
+      <label>Price (Rs.)<input id="mf-price" type="number" min="0" step="1" required/></label>
+      <label>Image file name<input id="mf-image" placeholder="IMG_5499.JPG" required/></label>
+      <label>Category<select id="mf-category" required></select></label>
+      <fieldset class="svc-checks">
+        <legend>Available for</legend>
+        <label><input type="checkbox" id="mf-dinein"/> Dine In</label>
+        <label><input type="checkbox" id="mf-takeaway"/> Take Away</label>
+        <label><input type="checkbox" id="mf-delivery"/> Delivery</label>
+      </fieldset>
+      <label class="chk-row"><input type="checkbox" id="mf-active" checked/> Show on website (active)</label>
+      <div class="modal-btns">
+        <button type="button" class="btn-cancel" onclick="closeItemForm()">Cancel</button>
+        <button type="submit" class="btn-save">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script>
-const API = "http://localhost:5000/api";
-let currentFilter = '';
-let allOrders = [];
-
-// Auth guard
-const token = localStorage.getItem('admin_token');
-const admin = JSON.parse(localStorage.getItem('admin_user') || 'null');
-if (!token || !admin || admin.role !== 'admin') {
-  window.location.href = 'admin-login.html';
-}
-document.getElementById('admin-name').textContent = admin ? admin.name : 'Admin';
-
-// Fetch helper with admin token
-async function adminFetch(path, opts = {}) {
-  const res  = await fetch(API + path, { ...opts, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, ...(opts.headers || {}) } });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.message || 'Request failed');
-  return json;
-}
-
-// Logout
-function doLogout() {
-  localStorage.removeItem('admin_token');
-  localStorage.removeItem('admin_user');
-  window.location.href = 'admin-login.html';
-}
-
-// Sidebar navigation
-function showView(view, el) {
-  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('act'));
-  if (el) el.classList.add('act');
-  const titles = { orders:'All Orders', pending:'Pending Orders', accepted:'Accepted Orders', rejected:'Rejected Orders' };
-  document.getElementById('page-title').textContent  = titles[view] || 'Orders';
-  document.getElementById('table-title').textContent = titles[view] || 'Orders';
-  currentFilter = (view === 'orders') ? '' : view.charAt(0).toUpperCase() + view.slice(1);
-  loadOrders();
-}
-
-// Load stats
-async function loadStats() {
-  try {
-    const res = await adminFetch('/admin/stats');
-    const d   = res.data;
-    document.getElementById('s-total').textContent    = d.total_orders;
-    document.getElementById('s-pending').textContent  = d.pending_orders;
-    document.getElementById('s-accepted').textContent = d.accepted_orders;
-    document.getElementById('s-rejected').textContent = d.rejected_orders;
-  } catch(e) {}
-}
-
-// Load orders
-async function loadOrders() {
-  const url = currentFilter ? `/admin/orders?status=${currentFilter}&per_page=100` : '/admin/orders?per_page=100';
-  try {
-    const res = await adminFetch(url);
-    allOrders = res.data.orders;
-    renderTable();
-  } catch(e) {
-    document.getElementById('tbl-container').innerHTML = `<div class="no-data">Failed to load. Is the backend running?</div>`;
-  }
-}
-
-// Render table
-function renderTable() {
-  const c = document.getElementById('tbl-container');
-  if (allOrders.length === 0) { c.innerHTML = '<div class="no-data">No orders found.</div>'; return; }
-  c.innerHTML = `<table>
-    <thead><tr>
-      <th>#</th><th>Customer</th><th>Items</th><th>Address</th>
-      <th>Total</th><th>Status</th><th>Time</th><th>Actions</th>
-    </tr></thead>
-    <tbody>
-      ${allOrders.map(o => `
-        <tr id="row-${o.id}">
-          <td><span class="oid">#${o.id}</span></td>
-          <td><div class="cust-name">${o.guest_name}</div><div class="cust-phone">${o.guest_phone}</div></td>
-          <td><div class="items-cell">${o.items.map(i=>`${i.item_name} <span class="qty">x${i.quantity}</span>`).join('<br/>')}</div></td>
-          <td><div class="addr-cell">${o.delivery_address}</div></td>
-          <td><span class="price-cell">Rs. ${o.total_price}</span></td>
-          <td><span class="sp sp-${o.status}" id="pill-${o.id}">${o.status}</span></td>
-          <td><span class="ts-cell">${new Date(o.created_at).toLocaleString()}</span></td>
-          <td><div class="act-wrap">
-            <button class="ab ab-acc ${o.status!=='Pending'?'ab-dis':''}" onclick="updateOrder(${o.id},'Accepted')">&#10004; Accept</button>
-            <button class="ab ab-rej ${o.status!=='Pending'?'ab-dis':''}" onclick="updateOrder(${o.id},'Rejected')">&#10008; Reject</button>
-          </div></td>
-        </tr>`).join('')}
-    </tbody>
-  </table>`;
-}
-
-// Update order status
-async function updateOrder(id, status) {
-  try {
-    await adminFetch(`/admin/orders/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ status })
-    });
-    const pill = document.getElementById('pill-'+id);
-    if (pill) { pill.textContent = status; pill.className = `sp sp-${status}`; }
-    const row = document.getElementById('row-'+id);
-    if (row) row.querySelectorAll('.ab').forEach(b => b.classList.add('ab-dis'));
-    const o = allOrders.find(x => x.id === id);
-    if (o) o.status = status;
-    showToast(`Order #${id} marked as ${status}`);
-    loadStats();
-  } catch(e) { showToast('Error: ' + e.message); }
-}
-
-// Toast
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// Load all + auto-refresh
-function loadAll() { loadStats(); loadOrders(); }
-loadAll();
-setInterval(loadAll, 30000);
-</script>
+<script src="api.js"></script>
+<script src="admin.js"></script>
 </body>
 </html>

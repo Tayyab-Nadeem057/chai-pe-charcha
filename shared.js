@@ -1,4 +1,4 @@
-// shared nav + page transitions
+// shared nav + page transitions (brand-logo.js runs first)
 (function(){
   // ── THEME TOGGLE ──
   const html = document.documentElement;

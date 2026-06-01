@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Admin Login &mdash; Chai Pe Charcha</title>
 <meta name="robots" content="noindex,nofollow"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared.css"/>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{min-height:100vh;display:flex;align-items:center;justify-content:center;
@@ -17,6 +18,8 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;
   border-radius:18px;padding:44px 40px;position:relative;z-index:1;
   box-shadow:0 24px 80px rgba(0,0,0,.5)}
 .logo{text-align:center;margin-bottom:32px}
+.logo .brand-lockup{justify-content:center}
+.logo .brand-mark{box-shadow:0 8px 32px rgba(255,106,0,.35)}
 .logo-ic{font-size:2.4rem;filter:drop-shadow(0 0 16px rgba(255,106,0,.5))}
 .logo h1{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:#FFF5E4;margin-top:10px}
 .logo p{font-size:.78rem;color:#7A5C3A;margin-top:5px;letter-spacing:.06em;text-transform:uppercase}
@@ -52,7 +55,7 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;
 <div class="glow"></div>
 <div class="card">
   <div class="logo">
-    <div class="logo-ic">&#9749;</div>
+    <a href="home.html" class="brand-lockup-slot" style="justify-content:center;margin-bottom:8px"></a>
     <h1>Admin Panel</h1>
     <p>Chai Pe Charcha &mdash; Restricted Access</p>
   </div>
@@ -66,9 +69,9 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;
   <div class="back-link"><a href="home.html">&larr; Back to Website</a></div>
 </div>
 
+<script src="brand-logo.js"></script>
+<script src="api.js"></script>
 <script>
-const API = "http://localhost:5000/api";
-
 if (localStorage.getItem("admin_token")) {
   window.location.href = "admin-panel.html";
 }

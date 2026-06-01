@@ -3,14 +3,17 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta name="description" content="Explore the full menu at Chai Pe Charcha — authentic Pakistani mains, BBQ & grill, snacks, and value deals. Fresh food, great taste, fast delivery in Karachi."/>
-<meta name="keywords" content="Chai Pe Charcha menu, Pakistani restaurant Karachi, chicken karahi, biryani, BBQ, nihari, food delivery Karachi"/>
+<meta name="description" content="Explore the full menu at Chai Pe Charcha — authentic Pakistani mains, BBQ &amp; grill, snacks, and value deals. Fresh food, great taste, fast delivery."/>
+<meta name="keywords" content="Chai Pe Charcha menu, Pakistani restaurant, chicken karahi, biryani, BBQ, food delivery"/>
 <meta property="og:title" content="Menu — Chai Pe Charcha"/>
-<meta property="og:description" content="Authentic Pakistani food — Mains, BBQ & Grill, Snacks and Deals. Order online from Chai Pe Charcha."/>
+<meta property="og:description" content="Authentic Pakistani food — Karhai, Burgers, Pizza, Rolls, Chai and more. Order online from Chai Pe Charcha."/>
 <meta property="og:type" content="website"/>
-<title>Menu &mdash; Chai Pe Charcha | Authentic Pakistani Restaurant Karachi</title>
+<title>Menu &mdash; Chai Pe Charcha | Authentic Pakistani Restaurant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="shared.css"/>
+<link rel="stylesheet" href="mobile.css"/>
 <link rel="stylesheet" href="menu-styles.css"/>
 </head>
 <body>
@@ -20,13 +23,11 @@
 <header>
   <nav id="nav" aria-label="Main navigation">
     <div class="nav-in">
-      <a href="home.html" class="nav-logo" data-pg aria-label="Chai Pe Charcha - Home">
-        <span class="logo-ic" aria-hidden="true">&#9749;</span>
-        <span class="logo-text">Chai Pe Charcha</span>
-      </a>
+      <a href="home.html" class="nav-logo" data-pg aria-label="Chai Pe Charcha — Home"></a>
       <ul class="nav-links" role="list">
         <li><a href="home.html" class="nl" data-pg>Home</a></li>
         <li><a href="menu.html" class="nl" data-pg>Menu</a></li>
+        <li><a href="track.html" class="nl" data-pg>Track Order</a></li>
         <li><a href="contact.html" class="nl" data-pg>Contact</a></li>
       </ul>
       <button id="theme-toggle" aria-label="Toggle day/night mode" title="Toggle Day / Night Mode">
@@ -44,6 +45,7 @@
   <div class="mob-menu" id="mob-menu" role="navigation" aria-label="Mobile navigation">
     <a href="home.html" class="mob-lnk" data-pg>Home</a>
     <a href="menu.html" class="mob-lnk" data-pg>Menu</a>
+    <a href="track.html" class="mob-lnk" data-pg>Track Order</a>
     <a href="contact.html" class="mob-lnk" data-pg>Contact</a>
   </div>
 </header>
@@ -58,51 +60,15 @@
     <p class="rev" style="--d:.2s">Every dish made fresh, every bite crafted with heart</p>
   </div>
 
-  <!-- STICKY CATEGORY NAV -->
+  <!-- STICKY CATEGORY NAV — pills injected by JS -->
   <nav class="cat-nav" id="catNav" aria-label="Menu categories">
-    <div class="cat-nav-in">
-      <button class="cat-pill active" data-cat="mains" aria-current="true">&#127858; Mains</button>
-      <button class="cat-pill" data-cat="bbq">&#128293; BBQ &amp; Grill</button>
-      <button class="cat-pill" data-cat="snacks">&#127839; Snacks</button>
-      <button class="cat-pill" data-cat="deals">&#11088; Deals</button>
-    </div>
+    <div class="cat-nav-in" id="catNav-in"></div>
   </nav>
 
-  <!-- MAINS -->
-  <section class="cat-section" id="sec-mains" aria-labelledby="heading-mains">
-    <div class="cat-banner rev">
-      <h2 id="heading-mains">&#127858; <span class="grad">Mains</span></h2>
-      <p>Hearty classics that define Pakistani cuisine</p>
-    </div>
-    <div class="menu-grid" id="grid-mains" role="list" aria-label="Main dishes"></div>
-  </section>
+  <div id="service-banner" class="service-banner" role="status" aria-live="polite"></div>
 
-  <!-- BBQ & GRILL -->
-  <section class="cat-section" id="sec-bbq" aria-labelledby="heading-bbq">
-    <div class="cat-banner rev">
-      <h2 id="heading-bbq">&#128293; <span class="grad">BBQ &amp; Grill</span></h2>
-      <p>Smoky, charcoal-fired perfection</p>
-    </div>
-    <div class="menu-grid" id="grid-bbq" role="list" aria-label="BBQ and grill items"></div>
-  </section>
-
-  <!-- SNACKS -->
-  <section class="cat-section" id="sec-snacks" aria-labelledby="heading-snacks">
-    <div class="cat-banner rev">
-      <h2 id="heading-snacks">&#127839; <span class="grad">Snacks</span></h2>
-      <p>Quick bites and evening favourites</p>
-    </div>
-    <div class="menu-grid" id="grid-snacks" role="list" aria-label="Snacks and light bites"></div>
-  </section>
-
-  <!-- DEALS -->
-  <section class="cat-section" id="sec-deals" aria-labelledby="heading-deals">
-    <div class="cat-banner rev">
-      <h2 id="heading-deals">&#11088; <span class="grad">Deals</span></h2>
-      <p>Great value combos for every occasion</p>
-    </div>
-    <div class="menu-grid" id="grid-deals" role="list" aria-label="Value deals and combos"></div>
-  </section>
+  <!-- ALL SECTIONS — injected dynamically by menu-app.js -->
+  <div id="menu-main"></div>
 
 </main>
 
@@ -110,10 +76,7 @@
 <footer>
   <div class="ft-in">
     <div class="ft-brand">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="logo-ic" aria-hidden="true">&#9749;</span>
-        <span class="logo-text">Chai Pe Charcha</span>
-      </div>
+      <a href="home.html" class="brand-lockup-slot brand-compact" data-pg aria-label="Chai Pe Charcha"></a>
       <p>Where great food brings people together</p>
     </div>
     <nav aria-label="Footer navigation">
@@ -141,16 +104,17 @@
     <div class="cd-msg" id="cd-msg" role="alert"></div>
     <div class="cd-row">
       <div class="cd-section"><label for="cd-name">Your Name</label><input id="cd-name" placeholder="Ali Khan" required autocomplete="name"/></div>
-      <div class="cd-section"><label for="cd-phone">Phone</label><input id="cd-phone" placeholder="03001234567" required autocomplete="tel"/></div>
+      <div class="cd-section"><label for="cd-phone">Phone</label><input id="cd-phone" placeholder="03021807669" required autocomplete="tel"/></div>
     </div>
-    <div class="cd-section"><label for="cd-addr">Delivery Address</label><input id="cd-addr" placeholder="House #5, Block B, Karachi" required autocomplete="street-address"/></div>
+    <div class="cd-section"><label for="cd-addr">Delivery Address</label><input id="cd-addr" placeholder="House #, Area, Hyderabad" required autocomplete="street-address"/></div>
     <button class="btn btn-p" style="width:100%;justify-content:center" onclick="placeOrder()">Place Order &rarr;</button>
   </div>
 </div>
 <button class="float-cart" id="float-cart" onclick="openCart()" aria-label="View cart">&#127869; View Cart <span class="fc-badge" id="fc-badge" aria-live="polite">0</span></button>
 
-<script src="api.js"></script>
-<script src="shared.js"></script>
-<script src="menu-app.js"></script>
+<script src="api.js?v=2"></script>
+<script src="brand-logo.js"></script>
+<script src="shared.js?v=2"></script>
+<script src="menu-app.js?v=5"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@1,300;1,600&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="mobile.css" />
   <style>
     .hero {
       position: relative;
@@ -153,6 +154,11 @@
       line-height: 1.5
     }
 
+    .service-row {
+      opacity: 0;
+      animation: fadeUp .9s .7s ease forwards
+    }
+
     .hero-btns {
       display: flex;
       gap: 16px;
@@ -166,7 +172,6 @@
       position: absolute;
       bottom: 36px;
       left: 50%;
-      transform: translateX(-50%);
       z-index: 2;
       display: flex;
       flex-direction: column;
@@ -177,7 +182,13 @@
       letter-spacing: .18em;
       text-transform: uppercase;
       opacity: 0;
-      animation: fadeUp 1s 1.2s ease forwards
+      transform: translateX(-50%);
+      animation: fadeUpScroll 1s 1.2s ease forwards;
+    }
+
+    @keyframes fadeUpScroll {
+      from { opacity: 0; transform: translateX(-50%) translateY(24px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
 
     .scroll-line {
@@ -519,7 +530,24 @@
 
     @media(max-width:768px) {
       .hero {
-        padding: 100px 24px 80px
+        padding: 100px 20px 100px
+      }
+
+      .hero-title {
+        font-size: clamp(2.6rem, 12vw, 4rem)
+      }
+
+      .hero-sub {
+        font-size: 1.05rem;
+        padding: 0 8px
+      }
+
+      .hero-scroll {
+        bottom: 24px;
+        left: 50%;
+        right: auto;
+        width: auto;
+        transform: translateX(-50%);
       }
 
       .why-strip-in {
@@ -552,6 +580,10 @@
         grid-template-columns: 1fr
       }
 
+      .fc-img {
+        height: 260px
+      }
+
       .sig-stats {
         grid-template-columns: 1fr 1fr
       }
@@ -563,11 +595,11 @@
   <div class="pt-overlay"></div>
   <nav id="nav">
     <div class="nav-in">
-      <a href="home.html" class="nav-logo" data-pg><span class="logo-ic">&#9749;</span><span class="logo-text">Chai Pe
-          Charcha</span></a>
+      <a href="home.html" class="nav-logo" data-pg aria-label="Chai Pe Charcha — Home"></a>
       <ul class="nav-links">
         <li><a href="home.html" class="nl" data-pg>Home</a></li>
         <li><a href="menu.html" class="nl" data-pg>Menu</a></li>
+        <li><a href="track.html" class="nl" data-pg>Track Order</a></li>
         <li><a href="contact.html" class="nl" data-pg>Contact</a></li>
       </ul>
       <button id="theme-toggle" aria-label="Toggle day/night mode" title="Toggle Day / Night Mode">
@@ -583,6 +615,7 @@
   <div class="mob-menu" id="mob-menu">
     <a href="home.html" class="mob-lnk" data-pg>Home</a>
     <a href="menu.html" class="mob-lnk" data-pg>Menu</a>
+    <a href="track.html" class="mob-lnk" data-pg>Track Order</a>
     <a href="contact.html" class="mob-lnk" data-pg>Contact</a>
   </div>
 
@@ -596,8 +629,28 @@
         Chai Pe<br />
         <span class="line2">Charcha</span>
       </h1>
-      <div class="hero-deco"><span>Est. 2018 &middot; Karachi</span></div>
+      <div class="hero-deco"><span>Est. 2020 &middot; Hyderabad</span></div>
       <p class="hero-sub">"Where great food brings people together"</p>
+      <p class="hero-sub">"theireh hfvoguh oguepfh" </p>
+
+      <div class="service-row">
+        <a href="menu.html?service=delivery" class="svc-btn" data-pg>
+          <span class="svc-ic" aria-hidden="true">&#128666;</span>
+          <span class="svc-label">Delivery</span>
+          <span class="svc-sub">To your door</span>
+        </a>
+        <a href="menu.html?service=takeaway" class="svc-btn" data-pg>
+          <span class="svc-ic" aria-hidden="true">&#127881;</span>
+          <span class="svc-label">Take Away</span>
+          <span class="svc-sub">Quick pickup</span>
+        </a>
+        <a href="menu.html?service=dinein" class="svc-btn" data-pg>
+          <span class="svc-ic" aria-hidden="true">&#127869;</span>
+          <span class="svc-label">Dine In</span>
+          <span class="svc-sub">At our table</span>
+        </a>
+      </div>
+
       <div class="hero-btns">
         <a href="menu.html" class="btn btn-p" data-pg>
           Explore Menu
@@ -605,7 +658,7 @@
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </a>
-        <a href="menu.html" class="btn btn-o" data-pg>Order Now</a>
+        <a href="menu.html" class="btn btn-order" data-pg>Order Now</a>
       </div>
     </div>
     <div class="hero-scroll">
@@ -619,7 +672,7 @@
   <section class="signature">
     <div class="sig-in">
       <div class="sig-visual rev left">
-        <img class="sig-img" src="images/chai_hero.png" alt="Chai Pe Charcha" />
+        <img class="sig-img" src="images/chai/IMG_5538.JPG" alt="Chai and food at Chai Pe Charcha" loading="lazy"/>
         <div class="sig-badge">Est. 2020<small>Hyderabad's Finest</small></div>
       </div>
       <div class="rev right">
@@ -653,36 +706,36 @@
     <div class="sec-hd rev">
       <span class="lbl">Must Try</span>
       <h2 class="sec-title grad2">Our Signature <span class="grad">Picks</span></h2>
-      <p class="sec-sub">A taste of what makes us Karachi's most beloved restaurant</p>
+      <p class="sec-sub">A taste of what makes us Hyderabad's most beloved spot</p>
     </div>
     <div class="cards-row">
       <div class="fc rev" style="--d:.05s">
-        <div class="fc-img"><span class="fc-tag">Best Seller</span><img src="images/karak_chai.png" alt="Chicken Karahi" />
+        <div class="fc-img"><span class="fc-tag">Best Seller</span><img src="images/karhai/IMG_5499.JPG" alt="Chicken Karahi" loading="lazy" decoding="async"/>
         </div>
         <div class="fc-body">
           <h3>Chicken Karahi</h3>
           <p>Slow-cooked in a rich tomato &amp; spice gravy. A true Pakistani classic.</p>
           <div class="fc-ft"><span class="fc-price">Rs. 850</span><button class="fc-add"
-              onclick="showToast('Chicken Karahi added!')">+ Add</button></div>
+              onclick="addFeatured('Chicken Karahi',850)">+ Add</button></div>
         </div>
       </div>
       <div class="fc rev" style="--d:.15s">
-        <div class="fc-img"><span class="fc-tag">Special</span><img src="images/kashmiri_chai.png"
-            alt="Daal Makhani" /></div>
+        <div class="fc-img"><span class="fc-tag">Special</span><img src="images/karhai/IMG_5510.JPG"
+            alt="Daal Makhani" loading="lazy" decoding="async"/></div>
         <div class="fc-body">
           <h3>Daal Makhani</h3>
           <p>Creamy black lentils slow-simmered overnight with butter &amp; aromatic spices.</p>
           <div class="fc-ft"><span class="fc-price">Rs. 450</span><button class="fc-add"
-              onclick="showToast('Daal Makhani added!')">+ Add</button></div>
+              onclick="addFeatured('Daal Makhani',450)">+ Add</button></div>
         </div>
       </div>
       <div class="fc rev" style="--d:.25s">
-        <div class="fc-img"><span class="fc-tag">Popular</span><img src="images/samosa.png" alt="Crispy Samosa" /></div>
+        <div class="fc-img"><span class="fc-tag">Popular</span><img src="images/rolls/IMG_5507.JPG" alt="Crispy Samosa" loading="lazy" decoding="async"/></div>
         <div class="fc-body">
           <h3>Crispy Samosa</h3>
           <p>Golden fried, stuffed with spiced potatoes &amp; herbs. A crowd favourite.</p>
           <div class="fc-ft"><span class="fc-price">Rs. 40</span><button class="fc-add"
-              onclick="showToast('Samosa added!')">+ Add</button></div>
+              onclick="addFeatured('Crispy Samosa',40)">+ Add</button></div>
         </div>
       </div>
     </div>
@@ -698,7 +751,7 @@
       <h2 class="sec-title">Craving Something <span class="grad">Delicious?</span></h2>
       <p>Come dine with us or order right now. Great food is always ready.</p>
       <div class="cta-btns">
-        <a href="menu.html" class="btn btn-p" data-pg>Order Now</a>
+        <a href="menu.html" class="btn btn-order" data-pg>Order Now</a>
         <a href="contact.html" class="btn btn-o" data-pg>Contact Us</a>
       </div>
     </div>
@@ -707,8 +760,7 @@
   <footer>
     <div class="ft-in">
       <div class="ft-brand">
-        <div style="display:flex;align-items:center;gap:10px"><span class="logo-ic">&#9749;</span><span
-            class="logo-text">Chai Pe Charcha</span></div>
+        <a href="home.html" class="brand-lockup-slot" data-pg aria-label="Chai Pe Charcha"></a>
         <p>Where great food brings people together</p>
       </div>
       <div class="ft-links">
@@ -721,22 +773,31 @@
   <div class="toast" id="toast"></div>
 
   <script src="api.js"></script>
+  <script src="brand-logo.js"></script>
   <script src="shared.js"></script>
   <script>
     (function () {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const c = document.getElementById('hero-canvas');
+      if (!c) return;
       const ctx = c.getContext('2d');
       let W, H, embers = [];
+      const mobile = window.matchMedia('(max-width:768px)').matches;
+      const count = mobile ? 35 : 70;
       function resize() { W = c.width = c.offsetWidth; H = c.height = c.offsetHeight }
       resize(); window.addEventListener('resize', resize);
-      for (let i = 0; i < 150; i++) {
+      for (let i = 0; i < count; i++) {
         embers.push({
-          x: Math.random() * 1920, y: Math.random() * 1080,
+          x: Math.random() * W, y: Math.random() * H,
           r: Math.random() * 1.8 + .3, vx: (Math.random() - .5) * .25, vy: -Math.random() * .35 - .08,
           a: Math.random() * .5 + .1, hue: Math.random() * 30
         });
       }
+      let frame = 0;
       function draw() {
+        if (document.hidden) { requestAnimationFrame(draw); return; }
+        frame++;
+        if (mobile && frame % 2 === 0) { requestAnimationFrame(draw); return; }
         ctx.clearRect(0, 0, W, H);
         embers.forEach(e => {
           const g = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.r * 3);
@@ -763,6 +824,11 @@
       es.forEach(e => { if (e.isIntersecting) { animCtr(e.target); cob.unobserve(e.target) } });
     }, { threshold: .5 });
     document.querySelectorAll('.ss-num').forEach(el => cob.observe(el));
+
+    function addFeatured(name, price) {
+      Cart.add({ item_name: name, price: price });
+      showToast(name + ' added — open Menu to checkout');
+    }
 
     document.querySelectorAll('.fc').forEach(card => {
       card.addEventListener('mousemove', e => {
