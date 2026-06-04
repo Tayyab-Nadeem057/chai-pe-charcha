@@ -48,43 +48,58 @@ body, #nav, .mob-menu, footer, .toast, .pt-overlay {
   transition: background var(--ease), color var(--ease), border-color var(--ease);
 }
 
-/* ── THEME TOGGLE BUTTON ── */
+/* ── THEME TOGGLE — iOS-style day/night slider ── */
 #theme-toggle {
   position: relative;
-  width: 56px;
-  height: 28px;
+  width: 58px;
+  height: 30px;
   border-radius: 99px;
-  border: none;
+  border: 1.5px solid rgba(255,255,255,0.35);
   cursor: pointer;
-  background: linear-gradient(135deg, #87CEEB, #FDB97D);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  transition: background var(--ease), box-shadow var(--ease);
+  /* light mode: warm sky blue → soft peach */
+  background: linear-gradient(110deg, #74C0E8 0%, #A8D8EA 40%, #FFD59E 100%);
+  box-shadow:
+    0 2px 8px rgba(116,192,232,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  transition: background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
   padding: 0;
 }
 [data-theme="dark"] #theme-toggle {
-  background: linear-gradient(135deg, #1a1a3e, #2d1b69);
-  box-shadow: 0 2px 12px rgba(255,106,0,0.2);
+  /* dark mode: deep midnight blue */
+  background: linear-gradient(110deg, #0F1B3D 0%, #1A2B5E 50%, #1E1145 100%);
+  border-color: rgba(138,100,255,0.35);
+  box-shadow:
+    0 2px 12px rgba(30,17,69,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.06);
 }
+
+/* Sun + Moon icon labels inside the track */
 .theme-toggle-track {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 6px;
+  padding: 0 7px;
   pointer-events: none;
+  border-radius: inherit;
 }
 .theme-toggle-track .t-icon {
-  font-size: .7rem;
+  font-size: .62rem;
   line-height: 1;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  display: block;
 }
-.t-sun  { opacity: 1; }
-.t-moon { opacity: 0.4; }
-[data-theme="dark"] .t-sun  { opacity: 0.4; }
-[data-theme="dark"] .t-moon { opacity: 1; }
+/* light mode: sun active, moon faded */
+.t-sun  { opacity: 1;   transform: scale(1); }
+.t-moon { opacity: 0.3; transform: scale(0.85); }
+/* dark mode: moon active, sun faded */
+[data-theme="dark"] .t-sun  { opacity: 0.3; transform: scale(0.85); }
+[data-theme="dark"] .t-moon { opacity: 1;   transform: scale(1); }
+
+/* Sliding knob */
 .theme-toggle-knob {
   position: absolute;
   top: 3px;
@@ -92,14 +107,22 @@ body, #nav, .mob-menu, footer, .toast, .pt-overlay {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.25);
-  transition: transform var(--ease), background var(--ease);
+  background: #FFFFFF;
+  box-shadow:
+    0 1px 4px rgba(0,0,0,0.22),
+    0 2px 8px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), background 0.35s ease, box-shadow 0.35s ease;
   pointer-events: none;
 }
+/* dark mode: knob slides right + turns warm amber */
 [data-theme="dark"] .theme-toggle-knob {
   transform: translateX(28px);
-  background: #FFB347;
+  background: linear-gradient(135deg, #FFD166, #FF9A3C);
+  box-shadow:
+    0 1px 4px rgba(0,0,0,0.3),
+    0 0 10px rgba(255,154,60,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.25);
 }
 
 /* Dark mode navbar scroll state */

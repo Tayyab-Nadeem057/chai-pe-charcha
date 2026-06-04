@@ -1,7 +1,5 @@
-// API base: same host as the site on port 5000 (works on LAN). Override via localStorage "cpc_api_base".
+// API base: localhost → local dev server, GitHub Pages (or any other host) → Render production.
 function getApiBase() {
-  const override = localStorage.getItem("cpc_api_base");
-  if (override) return override.replace(/\/$/, "");
   const { hostname } = window.location;
   if (!hostname || hostname === "localhost" || hostname === "127.0.0.1") {
     return "http://localhost:5000/api";
