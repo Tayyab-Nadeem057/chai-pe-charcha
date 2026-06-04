@@ -2,11 +2,11 @@
 function getApiBase() {
   const override = localStorage.getItem("cpc_api_base");
   if (override) return override.replace(/\/$/, "");
-  const { protocol, hostname } = window.location;
+  const { hostname } = window.location;
   if (!hostname || hostname === "localhost" || hostname === "127.0.0.1") {
     return "http://localhost:5000/api";
   }
-  return `${protocol}//${hostname}:5000/api`;
+  return "https://chai-pe-charcha-backend.onrender.com/api";
 }
 
 const API       = getApiBase();

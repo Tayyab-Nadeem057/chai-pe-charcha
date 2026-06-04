@@ -60,7 +60,7 @@ const CUSTOMIZATION_MAP = {
 // ── STATIC CATEGORY DATA ─────────────────────────────────────
 const CATEGORIES = [
   {
-    id: 'karhai', label: '🍲 Karhai',
+    id: 'karhai', label: ' Karhai',
     desc: 'Rich, slow-cooked karahis made fresh every day',
     folder: 'karhai',
     images: ['IMG_5499.JPG','IMG_5510.JPG','IMG_5511.JPG','IMG_5512.JPG','IMG_5513.WEBP'],
@@ -68,7 +68,7 @@ const CATEGORIES = [
     prices: [850, 1100, 950, 800, 900]
   },
   {
-    id: 'burger', label: '🍔 Burgers',
+    id: 'burger', label: ' Burgers',
     desc: 'Juicy, stacked burgers — loaded with flavour',
     folder: 'burger',
     images: ['IMG_5555.JPG','IMG_5556.JPG','IMG_5557.JPG','IMG_5558.JPG','IMG_5559.JPG','IMG_5560.JPG','IMG_5561.JPG','IMG_5562.JPG'],
@@ -76,7 +76,7 @@ const CATEGORIES = [
     prices: [350, 320, 480, 400, 370, 380, 420, 450]
   },
   {
-    id: 'pizza', label: '🍕 Pizza',
+    id: 'pizza', label: ' Pizza',
     desc: 'Stone-baked pizzas with bold Pakistani twists',
     folder: 'pizza',
     images: ['Chicken-Fajita-1.webp','Kababish Pizza.webp','chicken supreme.webp','creamy pizza.jpg','delight.png','images.jpg','kalzon.jpg','sicilian-meatballs.webp','tikka pizza.jpg'],
@@ -84,7 +84,7 @@ const CATEGORIES = [
     prices: [650, 600, 700, 580, 620, 500, 680, 750, 630]
   },
   {
-    id: 'tikka', label: '🔥 Tikka',
+    id: 'tikka', label: ' Tikka',
     desc: 'Charcoal-grilled tikkas, smoky & tender',
     folder: 'tikka',
     images: ['IMG_5526.JPG','IMG_5527.JPG','IMG_5528.JPG'],
@@ -92,7 +92,7 @@ const CATEGORIES = [
     prices: [500, 450, 550]
   },
   {
-    id: 'boti', label: '🍖 Boti',
+    id: 'boti', label: ' Boti',
     desc: 'Tender grilled boti pieces packed with spice',
     folder: 'boti',
     images: ['IMG_5530.JPG','IMG_5531.JPG','IMG_5532.JPG','IMG_5533.JPG','IMG_5534.JPG','IMG_5535.JPG'],
@@ -100,7 +100,7 @@ const CATEGORIES = [
     prices: [400, 550, 500, 420, 380, 480]
   },
   {
-    id: 'rolls', label: '🌯 Rolls',
+    id: 'rolls', label: ' Rolls',
     desc: 'Hot, stuffed rolls — perfect street food bite',
     folder: 'rolls',
     images: ['IMG_5507.JPG','IMG_5519.JPG','IMG_5520.JPG','IMG_5521.JPG','IMG_5522.JPG','IMG_5523.PNG','IMG_5524.JPG','IMG_5525.JPG'],
@@ -108,7 +108,7 @@ const CATEGORIES = [
     prices: [180, 200, 220, 160, 150, 250, 230, 280]
   },
   {
-    id: 'sandwiches', label: '🥪 Sandwiches',
+    id: 'sandwiches', label: ' Sandwiches',
     desc: 'Fresh, loaded sandwiches toasted to perfection',
     folder: 'sandwiches',
     images: ['IMG_5576.JPG','IMG_5577.JPG','IMG_5578.JPG'],
@@ -124,7 +124,7 @@ const CATEGORIES = [
     prices: [60, 120, 100, 180, 160, 200, 150, 80, 140, 90, 220]
   },
   {
-    id: 'pasta', label: '🍝 Pasta',
+    id: 'pasta', label: ' Pasta',
     desc: 'Creamy & spicy pastas with a Pakistani soul',
     folder: 'pasta',
     images: ['IMG_5497.JPG','IMG_5498.JPG','IMG_5500.JPG'],
@@ -132,7 +132,7 @@ const CATEGORIES = [
     prices: [350, 380, 360]
   },
   {
-    id: 'fries', label: '🍟 Fries',
+    id: 'fries', label: ' Fries',
     desc: 'Golden, crispy fries — plain or loaded',
     folder: 'fries',
     images: ['IMG_5568.JPG','IMG_5569.JPG','IMG_5570.JPG','IMG_5571.JPG','IMG_5572.JPG'],
@@ -140,7 +140,7 @@ const CATEGORIES = [
     prices: [150, 180, 250, 220, 200]
   },
   {
-    id: 'wings', label: '🍗 Wings',
+    id: 'wings', label: ' Wings',
     desc: 'Crispy, saucy chicken wings — totally addictive',
     folder: 'wings',
     images: ['IMG_5502.JPG','IMG_5503.JPG','IMG_5504.JPG'],
@@ -148,7 +148,7 @@ const CATEGORIES = [
     prices: [400, 420, 450]
   },
   {
-    id: 'chai', label: '☕ Chai',
+    id: 'chai', label: ' Chai',
     desc: 'The soul of every gathering — perfectly brewed',
     folder: 'chai',
     images: ['IMG_5536.JPG','IMG_5537.PNG','IMG_5538.JPG','IMG_5539.JPG','IMG_5540.JPG','IMG_5541.JPG','IMG_5542.JPG','IMG_5543.JPG','IMG_5544.JPG'],
@@ -156,7 +156,7 @@ const CATEGORIES = [
     prices: [60, 100, 80, 70, 80, 80, 90, 50, 70]
   },
   {
-    id: 'beverage', label: '🥤 Beverages',
+    id: 'beverage', label: ' Beverages',
     desc: 'Cool, refreshing drinks for every meal',
     folder: 'beverage',
     images: ['IMG_5583.JPG','IMG_5584.JPG','IMG_5585.JPG','IMG_5586.JPG','IMG_5587.JPG'],
@@ -164,7 +164,7 @@ const CATEGORIES = [
     prices: [180, 200, 120, 100, 80]
   },
   {
-    id: 'soup', label: '🍜 Soup',
+    id: 'soup', label: ' Soup',
     desc: 'Warm, hearty soups for every season',
     folder: 'soup',
     images: ['IMG_5573.JPG','IMG_5574.JPG'],
@@ -172,15 +172,7 @@ const CATEGORIES = [
     prices: [200, 220]
   },
   {
-    id: 'salad', label: '🥗 Salad',
-    desc: 'Fresh, crunchy salads — light & healthy',
-    folder: 'salad',
-    images: ['IMG_5582.JPG'],
-    names:  ['Garden Salad'],
-    prices: [150]
-  },
-  {
-    id: 'kids-menu', label: '🧒 Kids Menu',
+    id: 'kids-menu', label: ' Kids Menu',
     desc: 'Fun, tasty bites made just for little ones',
     folder: 'kids menu',
     images: ['IMG_5563.JPG','IMG_5564.JPG','IMG_5565.JPG','IMG_5566.JPG','IMG_5567.JPG'],
@@ -188,7 +180,16 @@ const CATEGORIES = [
     prices: [200, 180, 220, 250, 350]
   },
   {
-    id: 'side-items', label: '🍱 Side Items',
+    
+    id: 'salad', label: ' Salad',
+    desc: 'Fresh, crunchy salads — light & healthy',
+    folder: 'salad',
+    images: ['IMG_5582.JPG'],
+    names:  ['Garden Salad'],
+    prices: [150]
+  },
+  {
+    id: 'side-items', label: ' Side Items',
     desc: 'Perfect accompaniments to your main meal',
     folder: 'side items',
     images: ['IMG_5516.WEBP','IMG_5517.JPG','IMG_5579.JPG','IMG_5580.JPG','IMG_5581.JPG'],
