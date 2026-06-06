@@ -180,7 +180,6 @@ const CATEGORIES = [
     prices: [200, 180, 220, 250, 350]
   },
   {
-    
     id: 'salad', label: ' Salad',
     desc: 'Fresh, crunchy salads — light & healthy',
     folder: 'salad',
@@ -197,6 +196,14 @@ const CATEGORIES = [
     prices: [60, 30, 50, 25, 40]
   }
 ];
+
+// ── BACKEND WAKE PING (fire-and-forget) ────────────────────
+// Wakes Render free-tier backend in the background without blocking UI.
+(function pingBackend() {
+  const base = (typeof getApiBase === 'function') ? getApiBase() : null;
+  if (!base || base.includes('localhost')) return;
+  fetch(base.replace('/api', '/'), { method: 'GET', mode: 'no-cors' }).catch(() => {});
+})();
 
 // ── MENU DATA ────────────────────────────────────────────────
 let MENU_DATA = [];
@@ -366,7 +373,6 @@ function buildCard(item, delay) {
   d.className = 'mc rev';
   d.style.setProperty('--d', delay + 's');
 
-  // Sanitize name for inline handlers
   const safeName  = item.name.replace(/'/g, "\\'");
   const shortDesc = (item.desc || '').split('.')[0].trim();
 
@@ -386,18 +392,16 @@ function buildCard(item, delay) {
       <div class="mc-footer">
         <div class="mc-price"><strong>Rs. ${item.price}</strong></div>
         <button class="mc-add-btn"
-                aria-label="Add ${item.name}"
+                aria-label="Add ${item.name} to cart"
                 onclick="handleAddClick(event,'${safeName}',${item.price},'${item.catId}','${item.img}')">+</button>
       </div>
     </div>`;
 
-  // Click anywhere on card also opens modal / adds item
-  d.addEventListener('click', e => {
-    if (e.target.closest('.mc-add-btn')) return; // handled by button
-    handleAddClick(e, item.name, item.price, item.catId, item.img);
-  });
+  // ★ ISSUE 2 FIX: NO card-level click handler.
+  // Only the “+” button triggers add-to-cart.
+  // Tapping the image or card body does nothing (no accidental additions).
 
-  // 3-D tilt on hover — desktop only (hover: hover prevents touch devices)
+  // 3-D tilt on hover — desktop with real mouse only
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     d.addEventListener('mousemove', e => {
       const r  = d.getBoundingClientRect();
@@ -837,6 +841,21 @@ function showServiceBanner() {
   const main = document.getElementById('menu-main');
   // Show shimmer skeleton immediately — much better UX than plain text
   if (main) main.innerHTML = buildSkeletonHTML(window.innerWidth <= 768 ? 4 : 6);
+
+  // loadMenuData() now returns instantly (uses static data right away)
+  // and refreshes with API data in background if available
   await loadMenuData();
   buildMenu();
 })();
+
+// ── GLOBAL: addFeatured (used by home.html featured cards) ──────
+window.addFeatured = function(name, price) {
+  Cart.add({ item_name: name, price });
+  if (typeof updateFloatBtn === 'function') updateFloatBtn();
+  // Update global cart badge if on a non-menu page
+  const badge = document.getElementById('g-cart-badge');
+  if (badge) badge.textContent = Cart.count();
+  const btn = document.getElementById('g-float-cart');
+  if (btn) btn.classList.toggle('visible', Cart.count() > 0);
+  if (typeof showToast === 'function') showToast(`${name} added to cart! 🛒`);
+};

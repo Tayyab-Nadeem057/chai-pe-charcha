@@ -383,3 +383,91 @@ footer {
   .ft-in { flex-direction:column; text-align:center; }
   .ft-links { justify-content:center; flex-wrap:wrap; }
 }
+
+/* --------------------------------------------------
+   GLOBAL FLOATING BUTTONS (Issues 3 & 4)
+   Cart above WhatsApp — bottom-right corner
+-------------------------------------------------- */
+#g-float-wrap {
+  position: fixed;
+  bottom: 28px;
+  right: 24px;
+  z-index: 1400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.g-float-cart {
+  position: relative;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), #FF9A40);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 24px rgba(255,106,0,.45);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.6) translateY(16px);
+  transition: opacity .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+}
+.g-float-cart.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: all;
+}
+.g-float-cart:hover {
+  box-shadow: 0 10px 32px rgba(255,106,0,.6);
+  transform: scale(1.1) translateY(-2px);
+}
+.g-float-cart:active { transform: scale(0.96); }
+
+.g-cart-badge {
+  position: absolute;
+  top: -4px; right: -4px;
+  min-width: 20px; height: 20px;
+  border-radius: 99px;
+  background: #ef4444;
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  padding: 0 5px;
+  border: 2px solid #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+.g-wa-btn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 22px rgba(37,211,102,.45);
+  text-decoration: none;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .2s;
+}
+.g-wa-btn:hover {
+  transform: scale(1.12) translateY(-2px);
+  box-shadow: 0 10px 32px rgba(37,211,102,.6);
+  background: #20ba5a;
+}
+.g-wa-btn:active { transform: scale(0.96); }
+
+[data-theme="dark"] .g-cart-badge { border-color: var(--surface); }
+
+@media (max-width: 768px) {
+  #g-float-wrap { bottom: 20px; right: 16px; gap: 10px; }
+  .g-float-cart { width: 52px; height: 52px; font-size: 1.2rem; }
+  .g-wa-btn     { width: 48px; height: 48px; }
+  .toast        { left: 16px; right: 80px; bottom: 20px; }
+}
