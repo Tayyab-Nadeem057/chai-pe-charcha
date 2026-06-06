@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap');
-
+/* Fonts loaded via <link> in each page's <head> — no @import needed here */
 :root {
   --bg: #FFFAF5;
   --bg2: #FFF3E8;

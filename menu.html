@@ -8,10 +8,17 @@
 <meta property="og:title" content="Menu — Chai Pe Charcha"/>
 <meta property="og:description" content="Authentic Pakistani food — Karhai, Burgers, Pizza, Rolls, Chai and more. Order online from Chai Pe Charcha."/>
 <meta property="og:type" content="website"/>
+<!-- Mobile browser chrome colour -->
+<meta name="theme-color" content="#FF6A00"/>
 <title>Menu &mdash; Chai Pe Charcha | Authentic Pakistani Restaurant</title>
+<!-- DNS prefetch for API calls -->
+<link rel="dns-prefetch" href="//localhost"/>
+<!-- Font preconnect -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<!-- Single optimised font request with font-display=swap (no Cormorant needed on menu page) -->
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/></noscript>
 <link rel="stylesheet" href="shared.css"/>
 <link rel="stylesheet" href="mobile.css"/>
 <link rel="stylesheet" href="menu-styles.css"/>

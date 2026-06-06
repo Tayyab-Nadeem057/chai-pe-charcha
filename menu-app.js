@@ -235,7 +235,37 @@ function applyStaticServiceFilter(service) {
   MENU_DATA = MENU_DATA.filter(c => cfg.sections.includes(c.id));
 }
 
-// ── BUILD MENU ───────────────────────────────────────────────
+// ── SHARED INTERSECTION OBSERVER (reused across renders) ──────
+let _revealObserver = null;
+function getRevealObserver() {
+  if (!_revealObserver) {
+    _revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('done'); _revealObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.07 });
+  }
+  return _revealObserver;
+}
+
+// ── SKELETON LOADING ─────────────────────────────────────────
+function buildSkeletonHTML(count = 6) {
+  const card = `
+    <div class="skeleton-card">
+      <div class="skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line sl-title"></div>
+        <div class="skeleton-line sl-desc"></div>
+        <div class="skeleton-line sl-footer"></div>
+      </div>
+    </div>`;
+  return `
+    <div style="padding:32px 40px 0">
+      <div class="skeleton-grid">${card.repeat(count)}</div>
+    </div>`;
+}
+
+// ── BUILD MENU — Progressive batched rendering ───────────────
 function buildMenu() {
   const main       = document.getElementById('menu-main');
   const catNavIn   = document.getElementById('catNav-in');
@@ -247,15 +277,19 @@ function buildMenu() {
     return;
   }
 
+  const isMobile = window.innerWidth <= 768;
+
+  // Build all category pills immediately (lightweight)
   MENU_DATA.forEach((cat, catIdx) => {
-    // Category pill
     const pill = document.createElement('button');
     pill.className   = 'cat-pill' + (catIdx === 0 ? ' active' : '');
     pill.dataset.cat = cat.id;
     pill.textContent = cat.label;
     catNavIn.appendChild(pill);
+  });
 
-    // Section
+  // --- Render first category immediately (above the fold) ---
+  const renderCategory = (cat, catIdx) => {
     const sec = document.createElement('section');
     sec.className = 'cat-section';
     sec.id = 'sec-' + cat.id;
@@ -270,19 +304,58 @@ function buildMenu() {
     const grid = sec.querySelector('#grid-' + cat.id);
     (cat.items || []).forEach((item, i) => {
       const imgSrc = item.image || `images/${cat.folder}/${item.image_file || ''}`;
+      // Mobile: cap stagger at 0.25s with smaller step; Desktop: original behaviour
+      const maxDelay  = isMobile ? 0.25 : 0.5;
+      const stepDelay = isMobile ? 0.04 : 0.055;
+      const delay = Math.min(i * stepDelay, maxDelay);
       grid.appendChild(buildCard({
-        name:    item.name,
-        price:   item.price,
-        img:     imgSrc,
-        desc:    item.desc || cat.desc || '',
-        catId:   cat.id
-      }, i * 0.055));
+        name:  item.name,
+        price: item.price,
+        img:   imgSrc,
+        desc:  item.desc || cat.desc || '',
+        catId: cat.id
+      }, delay));
     });
-  });
+  };
 
-  setupReveal();
+  // Render the first category right away
+  renderCategory(MENU_DATA[0], 0);
+
+  // Schedule remaining categories progressively
+  // requestIdleCallback fires when the browser is idle between frames
+  const scheduleIdle = (fn) => {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(fn, { timeout: 400 });
+    } else {
+      setTimeout(fn, 50);
+    }
+  };
+
+  let idx = 1;
+  const renderNext = () => {
+    if (idx >= MENU_DATA.length) {
+      // All categories rendered — set up observers
+      setupReveal();
+      setupPillScroll();
+      setupSectionHighlight();
+      showServiceBanner();
+      updateFloatBtn();
+      return;
+    }
+    // Render a batch of categories per idle frame
+    const batchSize = isMobile ? 1 : 2;
+    const end = Math.min(idx + batchSize, MENU_DATA.length);
+    for (; idx < end; idx++) {
+      renderCategory(MENU_DATA[idx], idx);
+    }
+    scheduleIdle(renderNext);
+  };
+
+  scheduleIdle(renderNext);
+
+  // Set up pill scroll immediately after first paint
   setupPillScroll();
-  setupSectionHighlight();
+  setupReveal();
   showServiceBanner();
   updateFloatBtn();
 }
@@ -301,6 +374,8 @@ function buildCard(item, delay) {
     <div class="mc-img-wrap">
       <img src="${item.img}"
            alt="${item.name}"
+           width="400"
+           height="300"
            loading="lazy"
            decoding="async"
            onerror="this.parentElement.classList.add('img-fail')"/>
@@ -322,8 +397,8 @@ function buildCard(item, delay) {
     handleAddClick(e, item.name, item.price, item.catId, item.img);
   });
 
-  // 3-D tilt on hover (desktop)
-  if (window.matchMedia('(hover: hover)').matches) {
+  // 3-D tilt on hover — desktop only (hover: hover prevents touch devices)
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     d.addEventListener('mousemove', e => {
       const r  = d.getBoundingClientRect();
       const dx = (e.clientX - r.left - r.width / 2) / (r.width / 2);
@@ -484,11 +559,7 @@ function closeCustomizeModal() {
 
 // ── SCROLL REVEAL ────────────────────────────────────────────
 function setupReveal() {
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('done'); obs.unobserve(e.target); }
-    });
-  }, { threshold: 0.07 });
+  const obs = getRevealObserver();
   document.querySelectorAll('.rev:not(.done)').forEach(el => obs.observe(el));
 }
 
@@ -512,10 +583,11 @@ function setupPillScroll() {
   });
 }
 
-// ── ACTIVE PILL ON SCROLL ────────────────────────────────────
+// ── ACTIVE PILL ON SCROLL — throttled via rAF ────────────────
 function setupSectionHighlight() {
   const OFFSET  = 140;
   let lastCat   = '';
+  let rafPending = false;
 
   function setActive(cat) {
     if (cat === lastCat) return;
@@ -528,6 +600,7 @@ function setupSectionHighlight() {
   }
 
   function updateActivePill() {
+    rafPending = false;
     const sections = [...document.querySelectorAll('.cat-section')]
       .filter(s => s.style.display !== 'none');
     if (!sections.length) return;
@@ -538,7 +611,14 @@ function setupSectionHighlight() {
     setActive(current);
   }
 
-  window.addEventListener('scroll', updateActivePill, { passive: true });
+  window.addEventListener('scroll', () => {
+    // Throttle: only queue one rAF at a time
+    if (!rafPending) {
+      rafPending = true;
+      requestAnimationFrame(updateActivePill);
+    }
+  }, { passive: true });
+
   updateActivePill();
 }
 
@@ -755,7 +835,8 @@ function showServiceBanner() {
 // ── INIT ─────────────────────────────────────────────────────
 (async function initMenu() {
   const main = document.getElementById('menu-main');
-  if (main) main.innerHTML = '<p style="text-align:center;padding:80px 20px;color:var(--text-muted)">Loading menu…</p>';
+  // Show shimmer skeleton immediately — much better UX than plain text
+  if (main) main.innerHTML = buildSkeletonHTML(window.innerWidth <= 768 ? 4 : 6);
   await loadMenuData();
   buildMenu();
 })();
