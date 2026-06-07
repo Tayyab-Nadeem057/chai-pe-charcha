@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Backend Status — Chai Pe Charcha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: rgba(255,106,0,0.2);
+    --border2: rgba(255,255,255,0.07);
+    --orange: #FF6A00;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #f0f0f5;
+    --muted: #666680;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,106,0,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,106,0,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 48px; }
+  .header-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,106,0,.1); border: 1px solid var(--border);
+    color: var(--orange); font-size: .72rem; font-weight: 600;
+    letter-spacing: .15em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 99px; margin-bottom: 20px;
+  }
+  .header-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--orange); animation: blink 1.5s ease infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900; margin-bottom: 10px;
+  }
+  .header h1 span { color: var(--orange); }
+  .header p { color: var(--muted); font-size: .9rem; }
+
+  /* Status Card */
+  .status-card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .3s;
+  }
+  .status-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--orange), transparent);
+    opacity: 0; transition: opacity .3s;
+  }
+  .status-card.online { border-color: rgba(34,197,94,.3); }
+  .status-card.online::before { background: linear-gradient(90deg, transparent, var(--green), transparent); opacity: 1; }
+  .status-card.offline { border-color: rgba(239,68,68,.3); }
+  .status-card.offline::before { background: linear-gradient(90deg, transparent, var(--red), transparent); opacity: 1; }
+  .status-card.checking { border-color: rgba(245,158,11,.3); }
+  .status-card.checking::before { background: linear-gradient(90deg, transparent, var(--yellow), transparent); opacity: 1; }
+
+  .status-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .status-left { display: flex; align-items: center; gap: 14px; }
+  .status-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--muted); flex-shrink: 0;
+    transition: background .3s;
+    box-shadow: 0 0 0 0 transparent;
+  }
+  .online .status-dot { background: var(--green); animation: pulse-green 2s ease infinite; }
+  .offline .status-dot { background: var(--red); }
+  .checking .status-dot { background: var(--yellow); animation: pulse-yellow 1s ease infinite; }
+  @keyframes pulse-green {
+    0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.4); }
+    50% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  }
+  @keyframes pulse-yellow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.4); }
+    50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
+  }
+  .status-info h2 { font-size: 1rem; font-weight: 600; color: var(--text); }
+  .status-info p { font-size: .8rem; color: var(--muted); margin-top: 3px; font-family: var(--mono); }
+  .status-badge {
+    padding: 6px 16px; border-radius: 99px;
+    font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; flex-shrink: 0;
+    background: rgba(255,255,255,.06); color: var(--muted);
+    border: 1px solid var(--border2); transition: all .3s;
+  }
+  .online .status-badge { background: rgba(34,197,94,.12); color: var(--green); border-color: rgba(34,197,94,.3); }
+  .offline .status-badge { background: rgba(239,68,68,.12); color: var(--red); border-color: rgba(239,68,68,.3); }
+  .checking .status-badge { background: rgba(245,158,11,.12); color: var(--yellow); border-color: rgba(245,158,11,.3); }
+
+  .meta-row {
+    display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap;
+    padding-top: 20px; border-top: 1px solid var(--border2);
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 3px; }
+  .meta-label { font-size: .65rem; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+  .meta-value { font-size: .88rem; color: var(--text); font-family: var(--mono); font-weight: 600; }
+  .meta-value.green { color: var(--green); }
+  .meta-value.red   { color: var(--red); }
+  .meta-value.orange { color: var(--orange); }
+
+  /* Check Button */
+  .btn-check {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, var(--orange), #FF9A40);
+    color: #fff; border: none; border-radius: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: .95rem; font-weight: 700;
+    cursor: pointer; letter-spacing: .04em;
+    box-shadow: 0 6px 24px rgba(255,106,0,.35);
+    transition: transform .2s, box-shadow .2s, opacity .2s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .btn-check:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,106,0,.5); }
+  .btn-check:active { transform: scale(0.98); }
+  .btn-check:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .spin { animation: spin .7s linear infinite; display: inline-block; }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  /* Endpoint Grid */
+  .section-title {
+    font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 14px; margin-top: 32px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border2); }
+
+  .endpoint-grid { display: flex; flex-direction: column; gap: 10px; }
+  .ep-card {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; transition: border-color .25s, background .25s;
+    text-decoration: none;
+  }
+  .ep-card:hover { border-color: var(--border); background: var(--surface2); }
+  .ep-method {
+    font-family: var(--mono); font-size: .72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px; flex-shrink: 0;
+    letter-spacing: .05em;
+  }
+  .ep-method.get  { background: rgba(34,197,94,.12);  color: var(--green); }
+  .ep-method.post { background: rgba(255,106,0,.12);  color: var(--orange); }
+  .ep-path {
+    font-family: var(--mono); font-size: .82rem; color: var(--text);
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .ep-desc { font-size: .75rem; color: var(--muted); flex-shrink: 0; }
+  .ep-status {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border2); flex-shrink: 0;
+    transition: background .3s;
+  }
+  .ep-status.ok  { background: var(--green); }
+  .ep-status.err { background: var(--red); }
+
+  /* URL Box */
+  .url-box {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 18px 20px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .url-label { font-size: .72rem; color: var(--muted); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; flex-shrink: 0; }
+  .url-text {
+    font-family: var(--mono); font-size: .82rem; color: var(--orange);
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .copy-btn {
+    background: rgba(255,106,0,.1); border: 1px solid var(--border);
+    color: var(--orange); padding: 6px 14px; border-radius: 8px;
+    font-size: .75rem; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: background .2s;
+    flex-shrink: 0;
+  }
+  .copy-btn:hover { background: rgba(255,106,0,.2); }
+
+  /* Response box */
+  .response-box {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 18px 20px;
+    font-family: var(--mono); font-size: .78rem;
+    color: var(--muted); line-height: 1.7;
+    white-space: pre-wrap; word-break: break-all;
+    max-height: 260px; overflow-y: auto;
+    margin-top: 10px;
+    display: none;
+  }
+  .response-box.show { display: block; }
+  .response-box::-webkit-scrollbar { width: 4px; }
+  .response-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 18px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 900; color: var(--orange);
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+
+  .footer-note {
+    text-align: center; font-size: .78rem; color: var(--muted);
+    margin-top: 40px; line-height: 1.8;
+  }
+  .footer-note a { color: var(--orange); text-decoration: none; }
+  .footer-note a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .status-row { flex-direction: column; align-items: flex-start; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .ep-desc { display: none; }
+    .meta-row { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">API Status Monitor</div>
+    <h1>Chai Pe Charcha<br/><span>Backend</span></h1>
+    <p>Live status of the Render-hosted API server</p>
+  </div>
+
+  <!-- Backend URL -->
+  <div class="url-box">
+    <span class="url-label">Base URL</span>
+    <span class="url-text" id="base-url">https://chai-pe-charcha-backend.onrender.com/api</span>
+    <button class="copy-btn" onclick="copyUrl()">Copy</button>
+  </div>
+
+  <!-- Main Status Card -->
+  <div class="status-card" id="status-card">
+    <div class="status-row">
+      <div class="status-left">
+        <div class="status-dot" id="status-dot"></div>
+        <div class="status-info">
+          <h2 id="status-title">Not checked yet</h2>
+          <p id="status-url">https://chai-pe-charcha-backend.onrender.com</p>
+        </div>
+      </div>
+      <span class="status-badge" id="status-badge">Idle</span>
+    </div>
+    <div class="meta-row">
+      <div class="meta-item">
+        <span class="meta-label">Response Time</span>
+        <span class="meta-value" id="meta-rt">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Status Code</span>
+        <span class="meta-value" id="meta-code">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Last Checked</span>
+        <span class="meta-value" id="meta-time">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Version</span>
+        <span class="meta-value" id="meta-ver">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Check Button -->
+  <button class="btn-check" id="check-btn" onclick="runAllChecks()">
+    <span id="btn-icon">⚡</span> Check Backend Status
+  </button>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-checks">0</div>
+      <div class="stat-label">Checks Run</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num green" id="stat-ok" style="color:var(--green)">0</div>
+      <div class="stat-label">Passed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-fail" style="color:var(--red)">0</div>
+      <div class="stat-label">Failed</div>
+    </div>
+  </div>
+
+  <!-- Endpoints -->
+  <div class="section-title">API Endpoints</div>
+  <div class="endpoint-grid" id="ep-grid">
+
+    <div class="ep-card" id="ep-root" onclick="testEndpoint('/',  'ep-root', 'res-root')">
+      <span class="ep-method get">GET</span>
+      <span class="ep-path">/</span>
+      <span class="ep-desc">Health check</span>
+      <span class="ep-status" id="dot-root"></span>
+    </div>
+    <pre class="response-box" id="res-root"></pre>
+
+    <div class="ep-card" id="ep-menu" onclick="testEndpoint('/menu', 'ep-menu', 'res-menu')">
+      <span class="ep-method get">GET</span>
+      <span class="ep-path">/api/menu</span>
+      <span class="ep-desc">Full menu</span>
+      <span class="ep-status" id="dot-menu"></span>
+    </div>
+    <pre class="response-box" id="res-menu"></pre>
+
+    <div class="ep-card" id="ep-del" onclick="testEndpoint('/menu?service=delivery', 'ep-del', 'res-del')">
+      <span class="ep-method get">GET</span>
+      <span class="ep-path">/api/menu?service=delivery</span>
+      <span class="ep-desc">Delivery menu</span>
+      <span class="ep-status" id="dot-del"></span>
+    </div>
+    <pre class="response-box" id="res-del"></pre>
+
+    <div class="ep-card" id="ep-take" onclick="testEndpoint('/menu?service=takeaway', 'ep-take', 'res-take')">
+      <span class="ep-method get">GET</span>
+      <span class="ep-path">/api/menu?service=takeaway</span>
+      <span class="ep-desc">Takeaway menu</span>
+      <span class="ep-status" id="dot-take"></span>
+    </div>
+    <pre class="response-box" id="res-take"></pre>
+
+    <div class="ep-card" id="ep-dine" onclick="testEndpoint('/menu?service=dinein', 'ep-dine', 'res-dine')">
+      <span class="ep-method get">GET</span>
+      <span class="ep-path">/api/menu?service=dinein</span>
+      <span class="ep-desc">Dine-in menu</span>
+      <span class="ep-status" id="dot-dine"></span>
+    </div>
+    <pre class="response-box" id="res-dine"></pre>
+
+  </div>
+
+  <div class="footer-note">
+    <p>Backend hosted on <a href="https://render.com" target="_blank">Render.com</a> (free tier — may take 15–20s on cold start)</p>
+    <p style="margin-top:6px">Frontend: <a href="https://tayyab-nadeem057.github.io/chai-pe-charcha/menu.html" target="_blank">GitHub Pages →</a> &nbsp;|&nbsp; API: <a href="https://chai-pe-charcha-backend.onrender.com/api" target="_blank">Render →</a></p>
+  </div>
+
+</div>
+
+<script>
+const BASE   = 'https://chai-pe-charcha-backend.onrender.com';
+const API    = BASE + '/api';
+let checks = 0, ok = 0, fail = 0;
+
+function setCard(state, title, badge) {
+  const card = document.getElementById('status-card');
+  card.className = 'status-card ' + state;
+  document.getElementById('status-title').textContent = title;
+  document.getElementById('status-badge').textContent = badge;
+}
+
+function setBtnLoading(loading) {
+  const btn  = document.getElementById('check-btn');
+  const icon = document.getElementById('btn-icon');
+  btn.disabled = loading;
+  icon.className = loading ? 'spin' : '';
+  icon.textContent = loading ? '⟳' : '⚡';
+}
+
+async function runAllChecks() {
+  setBtnLoading(true);
+  setCard('checking', 'Checking...', 'Checking');
+
+  const t0 = performance.now();
+  try {
+    const res  = await fetch(BASE + '/', { cache: 'no-store' });
+    const rt   = Math.round(performance.now() - t0);
+    const json = await res.json();
+
+    document.getElementById('meta-rt').textContent   = rt + ' ms';
+    document.getElementById('meta-rt').className     = 'meta-value ' + (rt < 800 ? 'green' : rt < 3000 ? 'orange' : 'red');
+    document.getElementById('meta-code').textContent = res.status;
+    document.getElementById('meta-code').className   = 'meta-value ' + (res.ok ? 'green' : 'red');
+    document.getElementById('meta-time').textContent = new Date().toLocaleTimeString();
+    document.getElementById('meta-ver').textContent  = json.version || '1.0';
+
+    if (res.ok) {
+      setCard('online', 'Backend is Online ✓', 'Online');
+      ok++;
+    } else {
+      setCard('offline', 'Returned Error ' + res.status, 'Error');
+      fail++;
+    }
+  } catch(e) {
+    const rt = Math.round(performance.now() - t0);
+    document.getElementById('meta-rt').textContent   = rt + ' ms';
+    document.getElementById('meta-rt').className     = 'meta-value red';
+    document.getElementById('meta-code').textContent = 'Failed';
+    document.getElementById('meta-code').className   = 'meta-value red';
+    document.getElementById('meta-time').textContent = new Date().toLocaleTimeString();
+    setCard('offline', 'Backend Offline / Sleeping', 'Offline');
+    fail++;
+  }
+
+  checks++;
+  document.getElementById('stat-checks').textContent = checks;
+  document.getElementById('stat-ok').textContent     = ok;
+  document.getElementById('stat-fail').textContent   = fail;
+
+  // Auto-test all endpoints
+  await testEndpoint('/', 'ep-root', 'res-root');
+  await testEndpoint('/menu', 'ep-menu', 'res-menu');
+
+  setBtnLoading(false);
+}
+
+async function testEndpoint(path, cardId, resId) {
+  const dot  = document.getElementById('dot-' + cardId.replace('ep-',''));
+  const res_box = document.getElementById(resId);
+  const isApi = path.startsWith('/menu');
+  const url   = isApi ? (API + path) : (BASE + path);
+
+  if (dot) dot.className = 'ep-status';
+
+  try {
+    const t0  = performance.now();
+    const res = await fetch(url, { cache: 'no-store' });
+    const rt  = Math.round(performance.now() - t0);
+    const txt = await res.text();
+
+    let pretty;
+    try { pretty = JSON.stringify(JSON.parse(txt), null, 2); }
+    catch(_) { pretty = txt; }
+
+    // Truncate large menu responses for display
+    const display = pretty.length > 1200 ? pretty.slice(0, 1200) + '\n\n... (truncated — full response received)' : pretty;
+
+    if (dot) dot.className = 'ep-status ' + (res.ok ? 'ok' : 'err');
+    if (res_box) {
+      res_box.textContent = '// ' + res.status + ' ' + res.statusText + '  (' + rt + 'ms)\n\n' + display;
+      res_box.style.color = res.ok ? '#86efac' : '#fca5a5';
+      res_box.classList.add('show');
+    }
+  } catch(e) {
+    if (dot) dot.className = 'ep-status err';
+    if (res_box) {
+      res_box.textContent = '// Connection failed\n' + e.message;
+      res_box.style.color = '#fca5a5';
+      res_box.classList.add('show');
+    }
+  }
+}
+
+function copyUrl() {
+  navigator.clipboard.writeText('https://chai-pe-charcha-backend.onrender.com/api')
+    .then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => btn.textContent = 'Copy', 1800);
+    });
+}
+
+// Auto-check on load
+window.addEventListener('load', () => setTimeout(runAllChecks, 600));
+</script>
+</body>
+</html>
