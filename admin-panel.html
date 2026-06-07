@@ -5,97 +5,272 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Admin Panel — Chai Pe Charcha</title>
 <meta name="robots" content="noindex,nofollow"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="admin.css"/>
 </head>
 <body>
 
-<button type="button" class="mob-nav-btn" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+<!-- Mobile hamburger -->
+<button type="button" class="mob-nav-btn" onclick="toggleSidebar()" aria-label="Open sidebar">&#9776;</button>
 
-<aside class="sidebar">
-  <div class="sb-logo"><h2>&#9749; Chai Pe Charcha</h2><p>Admin Panel</p></div>
+<!-- Mobile overlay -->
+<div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">&#9749;</div>
+    <div class="sb-logo-text">
+      <h2>Chai Pe Charcha</h2>
+      <p>Admin Dashboard</p>
+    </div>
+    <button class="sb-collapse-btn" onclick="toggleSidebar()" title="Close">&#10005;</button>
+  </div>
+
   <nav class="sb-nav">
-    <div class="sb-item act" onclick="showView('orders',this)"><span class="sb-ic">&#128203;</span> All Orders</div>
-    <div class="sb-item" onclick="showView('pending',this)"><span class="sb-ic">&#9203;</span> Pending</div>
-    <div class="sb-item" onclick="showView('menu',this)"><span class="sb-ic">&#127869;</span> Menu Items</div>
+    <div class="sb-section-label">Orders</div>
+    <div class="sb-item act" id="nav-orders" onclick="showView('orders',this)">
+      <span class="sb-ic">&#128203;</span> All Orders
+      <span class="sb-badge" id="pending-badge" style="display:none">0</span>
+    </div>
+    <div class="sb-item" id="nav-pending" onclick="showView('pending',this)">
+      <span class="sb-ic">&#9203;</span> Pending
+    </div>
+    <div class="sb-item" id="nav-accepted" onclick="showView('accepted',this)">
+      <span class="sb-ic">&#9989;</span> Accepted
+    </div>
+    <div class="sb-item" id="nav-rejected" onclick="showView('rejected',this)">
+      <span class="sb-ic">&#10060;</span> Rejected
+    </div>
+
+    <div class="sb-section-label">Catalog</div>
+    <div class="sb-item" id="nav-menu" onclick="showView('menu',this)">
+      <span class="sb-ic">&#127869;</span> Menu Items
+    </div>
   </nav>
+
   <div class="sb-foot">
-    <div class="sb-admin"><span>Logged in as</span><strong id="admin-name">Admin</strong></div>
-    <button type="button" class="logout-btn" onclick="doLogout()">Logout</button>
+    <div class="sb-admin">
+      <div class="sb-avatar" id="admin-avatar">A</div>
+      <div class="sb-admin-info">
+        <span>Logged in as</span>
+        <strong id="admin-name">Admin</strong>
+      </div>
+    </div>
+    <button type="button" class="logout-btn" onclick="doLogout()">
+      &#8617; Logout
+    </button>
   </div>
 </aside>
 
+<!-- ── MAIN ── -->
 <main class="main">
+
+  <!-- Top header -->
   <div class="top-bar">
-    <div>
-      <h1 id="page-title">Orders</h1>
-      <div class="auto-badge"><span class="auto-dot"></span> Auto-refresh 30s</div>
+    <div class="top-bar-left">
+      <div class="page-title-wrap">
+        <h1 id="page-title">All Orders</h1>
+      </div>
+      <div class="auto-badge">
+        <span class="auto-dot"></span> Auto-refresh 30s
+      </div>
     </div>
-    <button type="button" class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
-  </div>
-
-  <div class="stats">
-    <div class="sc"><div class="sc-val o" id="s-total">—</div><div class="sc-label">Orders</div></div>
-    <div class="sc"><div class="sc-val y" id="s-pending">—</div><div class="sc-label">Pending</div></div>
-    <div class="sc"><div class="sc-val g" id="s-accepted">—</div><div class="sc-label">Accepted</div></div>
-    <div class="sc"><div class="sc-val r" id="s-rejected">—</div><div class="sc-label">Rejected</div></div>
-  </div>
-
-  <div id="view-orders" class="view-panel act">
-    <div id="tbl-container" class="tbl-wrap"><div class="no-data">Loading…</div></div>
-  </div>
-
-  <div id="view-pending" class="view-panel"></div>
-  <div id="view-accepted" class="view-panel"></div>
-  <div id="view-rejected" class="view-panel"></div>
-
-  <div id="view-menu" class="view-panel">
-    <div class="menu-toolbar">
-      <input type="search" id="menu-search" placeholder="Search items…" oninput="loadMenuAdmin()"/>
-      <select id="menu-cat-filter" onchange="loadMenuAdmin()"><option value="">All categories</option></select>
-      <select id="menu-svc-filter" onchange="loadMenuAdmin()">
-        <option value="">All services</option>
-        <option value="dinein">Dine In</option>
-        <option value="takeaway">Take Away</option>
-        <option value="delivery">Delivery</option>
-      </select>
-      <select id="menu-active-filter" onchange="loadMenuAdmin()">
-        <option value="">All status</option>
-        <option value="1">Active only</option>
-        <option value="0">Hidden only</option>
-      </select>
-      <button type="button" class="btn-add" onclick="openItemForm()">+ Add Item</button>
+    <div class="top-bar-right">
+      <button type="button" class="refresh-btn" id="refresh-btn" onclick="refreshPage()">
+        <span id="refresh-icon">&#8635;</span> Refresh
+      </button>
     </div>
-    <p class="hint">Changes save to the database and appear on the website immediately.</p>
-    <div id="menu-list" class="menu-grid"></div>
   </div>
+
+  <div class="page-content">
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="sc o">
+        <div class="sc-icon">&#128203;</div>
+        <div class="sc-val" id="s-total">—</div>
+        <div class="sc-label">Total Orders</div>
+      </div>
+      <div class="sc y">
+        <div class="sc-icon">&#9203;</div>
+        <div class="sc-val" id="s-pending">—</div>
+        <div class="sc-label">Pending</div>
+      </div>
+      <div class="sc g">
+        <div class="sc-icon">&#9989;</div>
+        <div class="sc-val" id="s-accepted">—</div>
+        <div class="sc-label">Accepted</div>
+      </div>
+      <div class="sc r">
+        <div class="sc-icon">&#10060;</div>
+        <div class="sc-val" id="s-rejected">—</div>
+        <div class="sc-label">Rejected</div>
+      </div>
+    </div>
+
+    <!-- Orders view -->
+    <div id="view-orders" class="view-panel act">
+      <div id="tbl-container" class="tbl-wrap">
+        <div class="no-data">
+          <span class="no-data-icon">&#9749;</span>
+          Loading orders…
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending / accepted / rejected are shown in the same orders container -->
+    <div id="view-pending"  class="view-panel"></div>
+    <div id="view-accepted" class="view-panel"></div>
+    <div id="view-rejected" class="view-panel"></div>
+
+    <!-- Menu view -->
+    <div id="view-menu" class="view-panel">
+      <div class="menu-header">
+        <div class="menu-header-left">
+          <h2>Menu Items</h2>
+          <p>Changes are live on the website immediately</p>
+        </div>
+        <button type="button" class="btn-add" onclick="openItemForm()">
+          &#43; Add Item
+        </button>
+      </div>
+
+      <div class="menu-toolbar">
+        <input type="search" id="menu-search" placeholder="&#128269; Search items…" oninput="loadMenuAdmin()"/>
+        <select id="menu-cat-filter" onchange="loadMenuAdmin()">
+          <option value="">All categories</option>
+        </select>
+        <select id="menu-svc-filter" onchange="loadMenuAdmin()">
+          <option value="">All services</option>
+          <option value="dinein">Dine In</option>
+          <option value="takeaway">Take Away</option>
+          <option value="delivery">Delivery</option>
+        </select>
+        <select id="menu-active-filter" onchange="loadMenuAdmin()">
+          <option value="">All status</option>
+          <option value="1">Active only</option>
+          <option value="0">Hidden only</option>
+        </select>
+      </div>
+
+      <p class="hint">&#128161; Changes save to the database and appear on the website immediately.</p>
+      <div id="menu-list" class="menu-grid"></div>
+    </div>
+
+  </div><!-- /page-content -->
 </main>
 
+<!-- ═══════════════════════════════════════════════════════
+     ITEM MODAL (Add / Edit)
+═══════════════════════════════════════════════════════ -->
 <div id="item-modal" class="modal">
   <div class="modal-box">
-    <h2 id="modal-title">Edit Item</h2>
-    <form onsubmit="saveItem(event)">
+    <div class="modal-header">
+      <h2 id="modal-title">Add Item</h2>
+      <button type="button" class="modal-close" onclick="closeItemForm()" aria-label="Close">&#10005;</button>
+    </div>
+
+    <form onsubmit="saveItem(event)" id="item-form">
       <input type="hidden" id="mf-id"/>
-      <label>Name<input id="mf-name" required/></label>
-      <label>Price (Rs.)<input id="mf-price" type="number" min="0" step="1" required/></label>
-      <label>Image file name<input id="mf-image" placeholder="IMG_5499.JPG" required/></label>
-      <label>Category<select id="mf-category" required></select></label>
-      <fieldset class="svc-checks">
-        <legend>Available for</legend>
-        <label><input type="checkbox" id="mf-dinein"/> Dine In</label>
-        <label><input type="checkbox" id="mf-takeaway"/> Take Away</label>
-        <label><input type="checkbox" id="mf-delivery"/> Delivery</label>
-      </fieldset>
-      <label class="chk-row"><input type="checkbox" id="mf-active" checked/> Show on website (active)</label>
+
+      <div class="fg-row">
+        <div class="fg">
+          <label>Item Name</label>
+          <input id="mf-name" placeholder="e.g. Chicken Karahi" required/>
+        </div>
+        <div class="fg">
+          <label>Price (Rs.)</label>
+          <input id="mf-price" type="number" min="0" step="1" placeholder="850" required/>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Category</label>
+        <select id="mf-category" required></select>
+      </div>
+
+      <!-- Image upload zone -->
+      <div class="fg">
+        <div class="fg-label">Item Image</div>
+
+        <!-- Preview (shown after image is selected) -->
+        <div class="img-preview-wrap" id="img-preview-wrap">
+          <img class="img-preview-thumb" id="img-preview-thumb" src="" alt="Preview"/>
+          <div class="img-preview-info">
+            <div class="img-preview-name" id="img-preview-name">—</div>
+            <div class="img-preview-size" id="img-preview-size"></div>
+            <span class="img-preview-badge" id="img-preview-badge">&#10003; Optimised</span>
+          </div>
+          <div class="img-preview-btns">
+            <button type="button" class="img-btn-replace" onclick="document.getElementById('mf-file').click()">Replace</button>
+            <button type="button" class="img-btn-remove" onclick="removeImagePreview()">Remove</button>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="img-progress-bar" id="img-progress-bar">
+          <div class="img-progress-fill" id="img-progress-fill"></div>
+        </div>
+
+        <!-- Drop zone (hidden when preview shown) -->
+        <div class="img-upload-zone" id="img-upload-zone"
+             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)">
+          <input type="file" id="mf-file" accept="image/jpeg,image/png,image/webp"
+                 onchange="handleImageSelect(event)"/>
+          <div class="upload-icon">&#128247;</div>
+          <p>
+            <strong>Click to browse</strong> or drag &amp; drop<br/>
+            JPG, PNG or WebP &mdash; auto-compressed
+          </p>
+        </div>
+
+        <!-- Hidden text field — stores the filename sent to backend (unchanged behaviour) -->
+        <input type="hidden" id="mf-image"/>
+      </div>
+
+      <!-- Services -->
+      <div class="svc-checks">
+        <div class="svc-checks-label">Available for</div>
+        <div class="svc-checks-row">
+          <label class="svc-pill">
+            <input type="checkbox" id="mf-dinein" checked/>
+            <span class="pill-dot"></span> Dine In
+          </label>
+          <label class="svc-pill">
+            <input type="checkbox" id="mf-takeaway" checked/>
+            <span class="pill-dot"></span> Take Away
+          </label>
+          <label class="svc-pill">
+            <input type="checkbox" id="mf-delivery" checked/>
+            <span class="pill-dot"></span> Delivery
+          </label>
+        </div>
+      </div>
+
+      <!-- Active toggle -->
+      <label class="chk-row">
+        <input type="checkbox" id="mf-active" checked/>
+        <div class="toggle-track"><div class="toggle-knob"></div></div>
+        Show on website (active)
+      </label>
+
       <div class="modal-btns">
         <button type="button" class="btn-cancel" onclick="closeItemForm()">Cancel</button>
-        <button type="submit" class="btn-save">Save</button>
+        <button type="submit" class="btn-save" id="btn-save">Save Item</button>
       </div>
     </form>
   </div>
 </div>
 
+<!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Hidden canvas for image compression -->
+<canvas id="compress-canvas" style="display:none"></canvas>
 
 <script src="api.js"></script>
 <script src="admin.js"></script>
