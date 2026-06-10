@@ -13,7 +13,7 @@
 <body>
 
 <!-- Mobile hamburger -->
-<button type="button" class="mob-nav-btn" onclick="toggleSidebar()" aria-label="Open sidebar">&#9776;</button>
+<button type="button" class="mob-nav-btn" id="mob-nav-btn" onclick="toggleSidebar()" aria-label="Open sidebar">&#9776;</button>
 
 <!-- Mobile overlay -->
 <div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
@@ -48,6 +48,11 @@
     <div class="sb-section-label">Catalog</div>
     <div class="sb-item" id="nav-menu" onclick="showView('menu',this)">
       <span class="sb-ic">&#127869;</span> Menu Items
+    </div>
+
+    <div class="sb-section-label">Account</div>
+    <div class="sb-item" id="nav-pw" onclick="openPwModal()">
+      <span class="sb-ic">&#128274;</span> Change Password
     </div>
   </nav>
 
@@ -113,18 +118,29 @@
 
     <!-- Orders view -->
     <div id="view-orders" class="view-panel act">
+      <!-- Desktop table (hidden on mobile via CSS) -->
       <div id="tbl-container" class="tbl-wrap">
         <div class="no-data">
           <span class="no-data-icon">&#9749;</span>
           Loading orders…
         </div>
       </div>
+      <!-- Mobile cards (hidden on desktop via CSS) -->
+      <div id="order-cards" class="order-cards"></div>
     </div>
 
-    <!-- Pending / accepted / rejected are shown in the same orders container -->
-    <div id="view-pending"  class="view-panel"></div>
-    <div id="view-accepted" class="view-panel"></div>
-    <div id="view-rejected" class="view-panel"></div>
+    <div id="view-pending"  class="view-panel">
+      <div id="tbl-pending"  class="tbl-wrap"></div>
+      <div id="cards-pending" class="order-cards"></div>
+    </div>
+    <div id="view-accepted" class="view-panel">
+      <div id="tbl-accepted" class="tbl-wrap"></div>
+      <div id="cards-accepted" class="order-cards"></div>
+    </div>
+    <div id="view-rejected" class="view-panel">
+      <div id="tbl-rejected" class="tbl-wrap"></div>
+      <div id="cards-rejected" class="order-cards"></div>
+    </div>
 
     <!-- Menu view -->
     <div id="view-menu" class="view-panel">
@@ -192,21 +208,21 @@
         <select id="mf-category" required></select>
       </div>
 
-      <!-- Image upload zone -->
+      <!-- Image upload -->
       <div class="fg">
         <div class="fg-label">Item Image</div>
 
-        <!-- Preview (shown after image is selected) -->
+        <!-- Preview shown after selection -->
         <div class="img-preview-wrap" id="img-preview-wrap">
           <img class="img-preview-thumb" id="img-preview-thumb" src="" alt="Preview"/>
           <div class="img-preview-info">
             <div class="img-preview-name" id="img-preview-name">—</div>
             <div class="img-preview-size" id="img-preview-size"></div>
-            <span class="img-preview-badge" id="img-preview-badge">&#10003; Optimised</span>
+            <span class="img-preview-badge">&#10003; Optimised</span>
           </div>
           <div class="img-preview-btns">
-            <button type="button" class="img-btn-replace" onclick="document.getElementById('mf-file').click()">Replace</button>
-            <button type="button" class="img-btn-remove" onclick="removeImagePreview()">Remove</button>
+            <button type="button" class="img-btn-replace" onclick="triggerFileInput()">Replace</button>
+            <button type="button" class="img-btn-remove"  onclick="removeImagePreview()">Remove</button>
           </div>
         </div>
 
@@ -215,20 +231,21 @@
           <div class="img-progress-fill" id="img-progress-fill"></div>
         </div>
 
-        <!-- Drop zone (hidden when preview shown) -->
+        <!-- Drop zone -->
         <div class="img-upload-zone" id="img-upload-zone"
              ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
-             ondrop="handleDrop(event)">
-          <input type="file" id="mf-file" accept="image/jpeg,image/png,image/webp"
-                 onchange="handleImageSelect(event)"/>
+             ondrop="handleDrop(event)"
+             onclick="triggerFileInput()">
           <div class="upload-icon">&#128247;</div>
-          <p>
-            <strong>Click to browse</strong> or drag &amp; drop<br/>
-            JPG, PNG or WebP &mdash; auto-compressed
-          </p>
+          <p><strong>Click to browse</strong> or drag &amp; drop<br/>JPG, PNG or WebP — auto-compressed</p>
         </div>
 
-        <!-- Hidden text field — stores the filename sent to backend (unchanged behaviour) -->
+        <!-- Hidden file input — NOT inside the drop zone to avoid double-trigger -->
+        <input type="file" id="mf-file" accept="image/jpeg,image/png,image/webp"
+               onchange="handleImageSelect(event)"
+               style="display:none"/>
+
+        <!-- Hidden field stores filename sent to backend -->
         <input type="hidden" id="mf-image"/>
       </div>
 
@@ -263,6 +280,93 @@
         <button type="submit" class="btn-save" id="btn-save">Save Item</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CHANGE PASSWORD MODAL
+═══════════════════════════════════════════════════════ -->
+<div id="pw-modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>&#128274; Password</h2>
+      <button type="button" class="modal-close" onclick="closePwModal()">&#10005;</button>
+    </div>
+
+    <!-- Tabs: Change vs Reset -->
+    <div class="pw-tabs">
+      <button type="button" class="pw-tab act" id="tab-change" onclick="switchPwTab('change')">Change Password</button>
+      <button type="button" class="pw-tab" id="tab-reset"  onclick="switchPwTab('reset')">Forgot Password</button>
+    </div>
+
+    <!-- Tab 1: Change (requires old password) -->
+    <div class="pw-panel act" id="panel-change">
+      <form onsubmit="doChangePassword(event)">
+        <div class="fg">
+          <label>Current Password</label>
+          <div class="pw-field-wrap">
+            <input type="password" id="pw-old" placeholder="Enter current password" autocomplete="current-password"/>
+            <button type="button" class="pw-eye" onclick="togglePwVis('pw-old',this)">&#128065;</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label>New Password</label>
+          <div class="pw-field-wrap">
+            <input type="password" id="pw-new" placeholder="At least 6 characters" autocomplete="new-password"
+                   oninput="updateStrength(this.value,'pw-strength-change')"/>
+            <button type="button" class="pw-eye" onclick="togglePwVis('pw-new',this)">&#128065;</button>
+          </div>
+          <div class="pw-strength show" id="pw-strength-change">
+            <div class="pw-strength-bar"><div class="pw-strength-fill" id="fill-change"></div></div>
+            <div class="pw-strength-label" id="label-change">Enter a password</div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Confirm New Password</label>
+          <div class="pw-field-wrap">
+            <input type="password" id="pw-confirm" placeholder="Re-enter new password" autocomplete="new-password"/>
+            <button type="button" class="pw-eye" onclick="togglePwVis('pw-confirm',this)">&#128065;</button>
+          </div>
+        </div>
+        <div class="modal-btns">
+          <button type="button" class="btn-cancel" onclick="closePwModal()">Cancel</button>
+          <button type="submit" class="btn-save" id="btn-pw-save">Update Password</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab 2: Forgot (no old password needed) -->
+    <div class="pw-panel" id="panel-reset">
+      <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6">
+        Enter your registered phone number and admin name to reset your password.
+      </p>
+      <form onsubmit="doResetPassword(event)">
+        <div class="fg">
+          <label>Registered Phone</label>
+          <input type="tel" id="rp-phone" placeholder="03001234567"/>
+        </div>
+        <div class="fg">
+          <label>Admin Name</label>
+          <input type="text" id="rp-name" placeholder="Your full name"/>
+        </div>
+        <div class="fg">
+          <label>New Password</label>
+          <div class="pw-field-wrap">
+            <input type="password" id="rp-new" placeholder="At least 6 characters"
+                   oninput="updateStrength(this.value,'pw-strength-reset')"/>
+            <button type="button" class="pw-eye" onclick="togglePwVis('rp-new',this)">&#128065;</button>
+          </div>
+          <div class="pw-strength show" id="pw-strength-reset">
+            <div class="pw-strength-bar"><div class="pw-strength-fill" id="fill-reset"></div></div>
+            <div class="pw-strength-label" id="label-reset">Enter a password</div>
+          </div>
+        </div>
+        <div class="modal-btns">
+          <button type="button" class="btn-cancel" onclick="closePwModal()">Cancel</button>
+          <button type="submit" class="btn-save" id="btn-rp-save">Reset Password</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

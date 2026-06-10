@@ -802,3 +802,257 @@ input, select, textarea { font-family: var(--font); }
   .svc-checks-row { flex-direction: column; }
   .modal-btns { flex-direction: column; }
 }
+
+/* -------------------------------------------------------
+   MOBILE ORDER CARDS
+   Shown only on phones, replaces the wide table
+------------------------------------------------------- */
+.order-cards { display: none; flex-direction: column; gap: 12px; }
+
+.order-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  transition: border-color var(--ease);
+}
+.order-card:active { border-color: var(--border-a); }
+
+.oc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.oc-id {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--orange);
+}
+.oc-time {
+  font-size: .7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.oc-customer {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.oc-name {
+  font-weight: 700;
+  font-size: .92rem;
+  color: var(--text);
+}
+.oc-phone {
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.oc-address {
+  font-size: .74rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.oc-items {
+  font-size: .8rem;
+  color: var(--text-mid);
+  line-height: 1.8;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.oc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.oc-total {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--orange);
+}
+.oc-actions {
+  display: flex;
+  gap: 8px;
+}
+.oc-btn {
+  padding: 10px 18px;
+  border-radius: var(--r-sm);
+  font-size: .8rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition: all var(--ease);
+  min-width: 80px;
+  text-align: center;
+}
+.oc-btn-acc {
+  background: var(--green-dim);
+  color: var(--green);
+  border-color: rgba(34,197,94,.25);
+}
+.oc-btn-acc:hover, .oc-btn-acc:active {
+  background: var(--green); color: #fff;
+}
+.oc-btn-rej {
+  background: var(--red-dim);
+  color: var(--red);
+  border-color: rgba(239,68,68,.25);
+}
+.oc-btn-rej:hover, .oc-btn-rej:active {
+  background: var(--red); color: #fff;
+}
+.oc-btn-dis {
+  opacity: .3;
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------
+   CHANGE PASSWORD MODAL
+------------------------------------------------------- */
+.pw-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg2);
+  border-radius: var(--r-sm);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.pw-tab {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: calc(var(--r-sm) - 2px);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--ease);
+  text-align: center;
+}
+.pw-tab.act {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.pw-panel { display: none; }
+.pw-panel.act { display: block; }
+
+/* Password field with show/hide toggle */
+.pw-field-wrap {
+  position: relative;
+}
+.pw-field-wrap input {
+  padding-right: 44px;
+}
+.pw-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  line-height: 1;
+  transition: color var(--ease);
+}
+.pw-eye:hover { color: var(--orange); }
+
+/* Password strength bar */
+.pw-strength {
+  margin-top: 6px;
+  display: none;
+}
+.pw-strength.show { display: block; }
+.pw-strength-bar {
+  height: 3px;
+  border-radius: 99px;
+  background: var(--border);
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.pw-strength-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .3s ease, background .3s ease;
+  width: 0%;
+}
+.pw-strength-label {
+  font-size: .68rem;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------------------
+   MOBILE RESPONSIVE OVERRIDES (PATCH)
+------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Fix header height — use smaller value on phones */
+  :root { --header-h: 56px; }
+
+  .top-bar {
+    height: var(--header-h);
+    padding: 0 12px 0 62px;
+  }
+  .top-bar h1 { font-size: 1rem; }
+  .auto-badge { display: none; }
+
+  /* Page content must not hide under header */
+  .page-content { padding: 16px 12px 80px; }
+
+  /* Stat cards: 2 cols, compact */
+  .stats { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .sc { padding: 14px 12px; }
+  .sc-icon { width: 32px; height: 32px; font-size: 1rem; margin-bottom: 8px; }
+  .sc-val { font-size: 1.5rem; }
+  .sc-label { font-size: .62rem; }
+
+  /* On mobile hide the wide table, show cards instead */
+  .tbl-wrap table { display: none; }
+  .order-cards { display: flex; }
+
+  /* Menu toolbar — stack vertically */
+  .menu-toolbar { padding: 10px; gap: 8px; }
+  .menu-toolbar input,
+  .menu-toolbar select {
+    min-width: 100%;
+    flex: 1 1 100%;
+    font-size: .82rem;
+  }
+  .menu-header { gap: 10px; }
+  .menu-header-left h2 { font-size: .95rem; }
+  .menu-header-left p { font-size: .72rem; }
+  .btn-add { padding: 9px 14px; font-size: .8rem; }
+
+  /* Menu grid: 1 col on phone */
+  .menu-grid { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Modal: full screen slide-up on mobile */
+  .modal { align-items: flex-end; padding: 0; }
+  .modal-box {
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    padding: 20px 16px;
+    width: 100%;
+  }
+
+  /* Make action buttons larger for touch */
+  .oc-btn { min-height: 44px; font-size: .82rem; }
+  .ab { min-height: 38px; padding: 8px 14px; }
+}
+
+@media (max-width: 480px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .modal-btns { flex-direction: column; }
+  .svc-checks-row { flex-direction: column; }
+  .oc-footer { flex-direction: column; align-items: flex-start; }
+  .oc-actions { width: 100%; }
+  .oc-btn { flex: 1; }
+}
