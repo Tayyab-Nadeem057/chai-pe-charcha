@@ -72,7 +72,7 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;
 <script src="brand-logo.js"></script>
 <script src="api.js"></script>
 <script>
-if (localStorage.getItem("admin_token")) {
+if (localStorage.getItem("admin_user")) {
   window.location.href = "admin-panel.html";
 }
 
@@ -106,8 +106,10 @@ async function doLogin(e) {
   btn.textContent = 'Verifying...'; btn.disabled = true;
 
   try {
+    // credentials:'include' lets the server set the httpOnly auth cookie + CSRF cookie.
     const res = await fetch(API + '/auth/login', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, password: pass })
     });
@@ -115,8 +117,8 @@ async function doLogin(e) {
     if (!res.ok || !json.success) throw new Error(json.message || 'Login failed');
     if (json.data.user.role !== 'admin') throw new Error('Access denied. Admin accounts only.');
 
-    localStorage.setItem('admin_token', json.data.token);
-    localStorage.setItem('admin_user',  JSON.stringify(json.data.user));
+    // Only non-sensitive display info in localStorage. The token stays in the cookie.
+    localStorage.setItem('admin_user', JSON.stringify(json.data.user));
     window.location.href = 'admin-panel.html';
   } catch(ex) {
     err.textContent = ex.message;

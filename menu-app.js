@@ -316,11 +316,13 @@ function buildMenu() {
       const stepDelay = isMobile ? 0.04 : 0.055;
       const delay = Math.min(i * stepDelay, maxDelay);
       grid.appendChild(buildCard({
-        name:  item.name,
-        price: item.price,
-        img:   imgSrc,
-        desc:  item.desc || cat.desc || '',
-        catId: cat.id
+        id:       item.id ?? null,
+        name:     item.name,
+        price:    item.price,
+        img:      imgSrc,
+        desc:     item.desc || cat.desc || '',
+        catId:    cat.id,
+        variants: item.variants && item.variants.length ? item.variants : null
       }, delay));
     });
   };
@@ -368,18 +370,20 @@ function buildMenu() {
 }
 
 // ── BUILD SINGLE CARD ────────────────────────────────────────
+// SECURITY: all DB/user strings are escaped, and the add handler is attached
+// via addEventListener (no inline onclick string-building → no XSS surface).
 function buildCard(item, delay) {
   const d = document.createElement('div');
   d.className = 'mc rev';
   d.style.setProperty('--d', delay + 's');
 
-  const safeName  = item.name.replace(/'/g, "\\'");
   const shortDesc = (item.desc || '').split('.')[0].trim();
+  const nameEsc   = escapeHtml(item.name);
 
   d.innerHTML = `
     <div class="mc-img-wrap">
-      <img src="${item.img}"
-           alt="${item.name}"
+      <img src="${escapeHtml(item.img)}"
+           alt="${nameEsc}"
            width="400"
            height="300"
            loading="lazy"
@@ -387,19 +391,18 @@ function buildCard(item, delay) {
            onerror="this.parentElement.classList.add('img-fail')"/>
     </div>
     <div class="mc-body">
-      <div class="mc-name">${item.name}</div>
-      ${shortDesc ? `<div class="mc-desc">${shortDesc}</div>` : ''}
+      <div class="mc-name">${nameEsc}</div>
+      ${shortDesc ? `<div class="mc-desc">${escapeHtml(shortDesc)}</div>` : ''}
       <div class="mc-footer">
-        <div class="mc-price"><strong>Rs. ${item.price}</strong></div>
-        <button class="mc-add-btn"
-                aria-label="Add ${item.name} to cart"
-                onclick="handleAddClick(event,'${safeName}',${item.price},'${item.catId}','${item.img}')">+</button>
+        <div class="mc-price"><strong>Rs. ${Number(item.price) || 0}</strong></div>
+        <button class="mc-add-btn" aria-label="Add ${nameEsc} to cart">+</button>
       </div>
     </div>`;
 
-  // ★ ISSUE 2 FIX: NO card-level click handler.
-  // Only the “+” button triggers add-to-cart.
-  // Tapping the image or card body does nothing (no accidental additions).
+  // Attach handler via listener (no inline onclick). Item data lives in closure.
+  d.querySelector('.mc-add-btn').addEventListener('click', (e) => handleAddClick(e, item));
+
+  // Only the “+” button triggers add-to-cart — tapping the card does nothing.
 
   // 3-D tilt on hover — desktop with real mouse only
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
@@ -415,15 +418,26 @@ function buildCard(item, delay) {
 }
 
 // ── HANDLE ADD CLICK ─────────────────────────────────────────
-// Decides whether to show modal or add directly.
-function handleAddClick(e, name, price, catId, imgSrc) {
+// Variants come from the DATABASE (item.variants). Falls back to the static
+// CUSTOMIZATION_MAP only in offline mode. Normalizes to {label, priceOffset}.
+function handleAddClick(e, item) {
   if (e && e.stopPropagation) e.stopPropagation();
-  const options = CUSTOMIZATION_MAP[catId];
+
+  let options = null;
+  if (item.variants && item.variants.length) {
+    options = item.variants.map(v => ({
+      label: v.label,
+      priceOffset: Number(v.price_offset ?? v.priceOffset ?? 0)
+    }));
+  } else if (CUSTOMIZATION_MAP[item.catId]) {
+    options = CUSTOMIZATION_MAP[item.catId];
+  }
+
   if (options && options.length) {
-    openCustomizeModal({ name, price, catId, imgSrc }, options);
+    openCustomizeModal({ id: item.id, name: item.name, price: item.price,
+                         catId: item.catId, imgSrc: item.img }, options);
   } else {
-    // Direct add
-    Cart.add({ item_name: name, price });
+    Cart.add({ item_id: item.id, item_name: item.name, price: Number(item.price) || 0 });
     updateFloatBtn();
     const btn = e && e.target && e.target.closest('.mc-add-btn');
     if (btn) {
@@ -433,7 +447,7 @@ function handleAddClick(e, name, price, catId, imgSrc) {
       if (card) { card.classList.add('glow-pulse'); setTimeout(() => card.classList.remove('glow-pulse'), 700); }
       setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+'; }, 1300);
     }
-    showToast(`${name} added to cart! 🛒`);
+    showToast(`${item.name} added to cart! 🛒`);
   }
 }
 
@@ -547,7 +561,7 @@ function confirmCustomizeAdd() {
   const price = _modalItem.price + opt.priceOffset;
   const name  = `${_modalItem.name} (${opt.label})`;
 
-  Cart.add({ item_name: name, price });
+  Cart.add({ item_id: _modalItem.id, item_name: name, variant: opt.label, price });
   updateFloatBtn();
   showToast(`${name} added to cart! 🛒`);
   closeCustomizeModal();
@@ -667,24 +681,36 @@ function renderDrawer() {
   foot.style.display = 'block';
 
   const total = Cart.total();
-  body.innerHTML = items.map(item => {
-    const safeName = (item.item_name || '').replace(/'/g, "\\'");
+  body.innerHTML = items.map((item, idx) => {
+    const nameEsc = escapeHtml(item.item_name);
     return `
       <div class="cd-item">
         <div class="cd-item-info">
-          <div class="cd-item-name">${item.item_name}</div>
-          <div class="cd-item-price">Rs. ${item.price} each</div>
+          <div class="cd-item-name">${nameEsc}</div>
+          <div class="cd-item-price">Rs. ${Number(item.price) || 0} each</div>
         </div>
         <div class="cd-qty">
-          <button onclick="cqty('${safeName}',-1)" aria-label="Decrease quantity">−</button>
+          <button data-cq="${idx}" data-d="-1" aria-label="Decrease quantity">−</button>
           <span>${item.quantity}</span>
-          <button onclick="cqty('${safeName}',1)"  aria-label="Increase quantity">+</button>
+          <button data-cq="${idx}" data-d="1"  aria-label="Increase quantity">+</button>
         </div>
         <div class="cd-item-subtotal">Rs. ${item.quantity * item.price}</div>
-        <button class="cd-del" onclick="cdel('${safeName}')" aria-label="Remove item">✕</button>
+        <button class="cd-del" data-cdel="${idx}" aria-label="Remove item">✕</button>
       </div>`;
   }).join('') +
   `<div class="cd-total"><span>Total</span><strong>Rs. ${total}</strong></div>`;
+
+  // Wire quantity/delete via listeners (no inline onclick → no injection).
+  body.querySelectorAll('[data-cq]').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const it = Cart.get()[+btn.dataset.cq];
+      if (it) cqty(it.item_name, +btn.dataset.d);
+    }));
+  body.querySelectorAll('[data-cdel]').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const it = Cart.get()[+btn.dataset.cdel];
+      if (it) cdel(it.item_name);
+    }));
 }
 
 // ── CART ACTIONS ─────────────────────────────────────────────
@@ -723,26 +749,27 @@ async function placeOrder() {
   if (!addrVal)  { showMsg(msg, 'Please enter your delivery address.', 'bad'); return; }
   if (Cart.count() === 0) { showMsg(msg, 'Your cart is empty!', 'bad'); return; }
 
-  // Validate cart data before sending
+  // Build payload: send item_id + variant + quantity ONLY.
+  // The server looks up the real price from the DB — the client never sets price.
   const cartItems = Cart.get();
   const validItems = cartItems
-    .filter(i => i && i.item_name && typeof i.quantity === 'number' && typeof i.price === 'number')
+    .filter(i => i && i.item_id != null && typeof i.quantity === 'number')
     .map(i => ({
-      item_name: String(i.item_name).trim(),
-      quantity:  Math.max(1, Math.floor(i.quantity)),
-      price:     Math.max(0, Number(i.price))
+      item_id:  i.item_id,
+      variant:  i.variant || null,
+      quantity: Math.max(1, Math.floor(i.quantity))
     }));
 
   if (!validItems.length) {
-    showMsg(msg, 'Cart data is invalid. Please clear your cart and try again.', 'bad');
+    showMsg(msg, 'Your cart could not be verified. Please refresh the menu and re-add items.', 'bad');
     return;
   }
+
+  const service = new URLSearchParams(location.search).get('service') || 'delivery';
 
   // Disable button immediately
   btn.disabled    = true;
   btn.textContent = '⏳ Placing order...';
-
-  console.log('[CPC] Placing order:', { name: nameVal, phone: phoneVal, items: validItems });
 
   // Timeout guard — 12 seconds max
   const timeoutPromise = new Promise((_, reject) =>
@@ -757,13 +784,13 @@ async function placeOrder() {
           name:             nameVal,
           phone:            phoneVal,
           delivery_address: addrVal,
+          service:          service,
           items:            validItems
         })
       }),
       timeoutPromise
     ]);
 
-    console.log('[CPC] Order success:', res);
     localStorage.setItem('last_order', JSON.stringify({
       id:    res.data.id,
       name:  nameVal,
@@ -849,13 +876,9 @@ function showServiceBanner() {
 })();
 
 // ── GLOBAL: addFeatured (used by home.html featured cards) ──────
-window.addFeatured = function(name, price) {
-  Cart.add({ item_name: name, price });
-  if (typeof updateFloatBtn === 'function') updateFloatBtn();
-  // Update global cart badge if on a non-menu page
-  const badge = document.getElementById('g-cart-badge');
-  if (badge) badge.textContent = Cart.count();
-  const btn = document.getElementById('g-float-cart');
-  if (btn) btn.classList.toggle('visible', Cart.count() > 0);
-  if (typeof showToast === 'function') showToast(`${name} added to cart! 🛒`);
+// Featured cards are static and have no DB item_id, so they can't be priced
+// server-side. Send the customer to the live menu to order the real item.
+window.addFeatured = function(name) {
+  if (typeof showToast === 'function') showToast(`Pick ${name} on the menu →`);
+  setTimeout(() => { window.location.href = 'menu.html'; }, 500);
 };

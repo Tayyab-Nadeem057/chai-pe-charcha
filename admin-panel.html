@@ -275,6 +275,13 @@
         Show on website (active)
       </label>
 
+      <!-- Sold-out toggle -->
+      <label class="chk-row">
+        <input type="checkbox" id="mf-soldout"/>
+        <div class="toggle-track"><div class="toggle-knob"></div></div>
+        Mark as sold out (visible but can't be ordered)
+      </label>
+
       <div class="modal-btns">
         <button type="button" class="btn-cancel" onclick="closeItemForm()">Cancel</button>
         <button type="submit" class="btn-save" id="btn-save">Save Item</button>
@@ -293,13 +300,12 @@
       <button type="button" class="modal-close" onclick="closePwModal()">&#10005;</button>
     </div>
 
-    <!-- Tabs: Change vs Reset -->
-    <div class="pw-tabs">
-      <button type="button" class="pw-tab act" id="tab-change" onclick="switchPwTab('change')">Change Password</button>
-      <button type="button" class="pw-tab" id="tab-reset"  onclick="switchPwTab('reset')">Forgot Password</button>
-    </div>
+    <!-- Change password requires the current password. A forgotten password is
+         reset by another admin (Staff → Reset) or via create_admin.py — never
+         by just knowing a name + phone. -->
+    <div class="pw-panel act" id="panel-change-only" style="display:none"></div>
 
-    <!-- Tab 1: Change (requires old password) -->
+    <!-- Change (requires old password) -->
     <div class="pw-panel act" id="panel-change">
       <form onsubmit="doChangePassword(event)">
         <div class="fg">
@@ -312,7 +318,7 @@
         <div class="fg">
           <label>New Password</label>
           <div class="pw-field-wrap">
-            <input type="password" id="pw-new" placeholder="At least 6 characters" autocomplete="new-password"
+            <input type="password" id="pw-new" placeholder="At least 8 characters" autocomplete="new-password"
                    oninput="updateStrength(this.value,'pw-strength-change')"/>
             <button type="button" class="pw-eye" onclick="togglePwVis('pw-new',this)">&#128065;</button>
           </div>
@@ -335,38 +341,6 @@
       </form>
     </div>
 
-    <!-- Tab 2: Forgot (no old password needed) -->
-    <div class="pw-panel" id="panel-reset">
-      <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6">
-        Enter your registered phone number and admin name to reset your password.
-      </p>
-      <form onsubmit="doResetPassword(event)">
-        <div class="fg">
-          <label>Registered Phone</label>
-          <input type="tel" id="rp-phone" placeholder="03001234567"/>
-        </div>
-        <div class="fg">
-          <label>Admin Name</label>
-          <input type="text" id="rp-name" placeholder="Your full name"/>
-        </div>
-        <div class="fg">
-          <label>New Password</label>
-          <div class="pw-field-wrap">
-            <input type="password" id="rp-new" placeholder="At least 6 characters"
-                   oninput="updateStrength(this.value,'pw-strength-reset')"/>
-            <button type="button" class="pw-eye" onclick="togglePwVis('rp-new',this)">&#128065;</button>
-          </div>
-          <div class="pw-strength show" id="pw-strength-reset">
-            <div class="pw-strength-bar"><div class="pw-strength-fill" id="fill-reset"></div></div>
-            <div class="pw-strength-label" id="label-reset">Enter a password</div>
-          </div>
-        </div>
-        <div class="modal-btns">
-          <button type="button" class="btn-cancel" onclick="closePwModal()">Cancel</button>
-          <button type="submit" class="btn-save" id="btn-rp-save">Reset Password</button>
-        </div>
-      </form>
-    </div>
   </div>
 </div>
 

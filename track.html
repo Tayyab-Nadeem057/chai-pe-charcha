@@ -125,13 +125,27 @@ function search() {
   fetchOrder(id);
 }
 
+// The customer who placed the order has their phone saved locally. We send it
+// so the server returns full details — anyone else only sees the status.
+function knownPhone(id) {
+  try {
+    const lo = JSON.parse(localStorage.getItem('last_order') || 'null');
+    if (lo && String(lo.id) === String(id) && lo.phone) return lo.phone;
+  } catch (_) {}
+  return '';
+}
+function orderPath(id) {
+  const ph = knownPhone(id);
+  return '/orders/' + id + (ph ? '?phone=' + encodeURIComponent(ph) : '');
+}
+
 async function fetchOrder(id) {
   curId = id;
   clearInterval(pollTimer);
   clearInterval(countdown);
   showLoading();
   try {
-    const json = await apiFetch('/orders/' + id);
+    const json = await apiFetch(orderPath(id));
     render(json.data);
     if (json.data.status === 'Pending') pollTimer = setInterval(poll, 5000);
   } catch (e) {
@@ -142,7 +156,7 @@ async function fetchOrder(id) {
 
 async function poll() {
   try {
-    const json = await apiFetch('/orders/' + curId);
+    const json = await apiFetch(orderPath(curId));
     if (json.data.status !== lastStatus) {
       clearInterval(pollTimer);
       render(json.data);
@@ -216,13 +230,20 @@ function startCountdown(endTime) {
 }
 
 function orderSummary(o) {
-  const items = o.items.map(i => i.item_name + ' &times;' + i.quantity).join(', ');
+  const esc = (window.escapeHtml || ((x) => x));
+  // Status-only view (no phone proof): show just the order number.
+  if (!o.items) {
+    return `<div class="summary">
+      <div class="s-row"><span class="s-key">Order #</span><span class="s-val">${esc(o.id)}</span></div>
+    </div>`;
+  }
+  const items = o.items.map(i => esc(i.item_name) + ' &times;' + esc(i.quantity)).join(', ');
   return `<div class="summary">
-    <div class="s-row"><span class="s-key">Order #</span><span class="s-val">${o.id}</span></div>
-    <div class="s-row"><span class="s-key">Name</span><span class="s-val">${o.guest_name}</span></div>
+    <div class="s-row"><span class="s-key">Order #</span><span class="s-val">${esc(o.id)}</span></div>
+    <div class="s-row"><span class="s-key">Name</span><span class="s-val">${esc(o.guest_name)}</span></div>
     <div class="s-row"><span class="s-key">Items</span><span class="s-val">${items}</span></div>
-    <div class="s-row"><span class="s-key">Total</span><span class="s-val orange">Rs. ${o.total_price}</span></div>
-    <div class="s-row"><span class="s-key">Address</span><span class="s-val">${o.delivery_address}</span></div>
+    <div class="s-row"><span class="s-key">Total</span><span class="s-val orange">Rs. ${esc(o.total_price)}</span></div>
+    <div class="s-row"><span class="s-key">Address</span><span class="s-val">${esc(o.delivery_address)}</span></div>
   </div>`;
 }
 
