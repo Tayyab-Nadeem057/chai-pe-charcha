@@ -139,6 +139,8 @@ async function doLogin(e) {
 
     // Only non-sensitive display info in localStorage. The token stays in the cookie.
     localStorage.setItem('admin_user', JSON.stringify(json.data.user));
+    // CSRF token (needed for write actions across domains).
+    if (json.data.csrf) localStorage.setItem('admin_csrf', json.data.csrf);
     window.location.href = 'admin-panel.html';
   } catch(ex) {
     err.textContent = ex.message;

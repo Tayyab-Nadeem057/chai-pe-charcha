@@ -32,6 +32,7 @@ async function adminFetch(path, opts = {}) {
   } catch (e) {
     if (e && e.status === 401) {
       localStorage.removeItem("admin_user");
+      localStorage.removeItem("admin_csrf");
       location.href = "admin-login.html";
     }
     throw new Error((e && e.message) || "Request failed");
@@ -42,6 +43,7 @@ async function adminFetch(path, opts = {}) {
 async function doLogout() {
   try { await apiFetch("/auth/logout", { method: "POST" }); } catch (_) {}
   localStorage.removeItem("admin_user");
+  localStorage.removeItem("admin_csrf");
   location.href = "admin-login.html";
 }
 
@@ -407,7 +409,7 @@ async function processImage(file) {
   fill.style.width = "50%";
 
   try {
-    const csrf = getCookie("csrf_access_token");
+    const csrf = localStorage.getItem("admin_csrf") || getCookie("csrf_access_token");
     const fd = new FormData();
     fd.append("image", file);
     const res = await fetch(API + "/admin/menu/upload", {

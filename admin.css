@@ -756,15 +756,16 @@ input, select, textarea { font-family: var(--font); }
 ═══════════════════════════════════════════════════════ */
 .mob-nav-btn {
   display: none;
-  position: fixed; top: 12px; left: 12px; z-index: 400;
-  width: 44px; height: 44px; border-radius: var(--r-sm);
-  border: 1px solid var(--border);
-  background: var(--surface); color: var(--text);
-  font-size: 1.1rem; align-items: center; justify-content: center;
-  box-shadow: var(--shadow);
+  position: fixed; top: 10px; left: 12px; z-index: 400;
+  width: 46px; height: 46px; border-radius: var(--r-sm);
+  border: none;
+  background: linear-gradient(135deg, var(--orange), var(--orange-l));
+  color: #fff;
+  font-size: 1.25rem; align-items: center; justify-content: center;
+  box-shadow: 0 4px 18px rgba(255,106,0,0.45);
   transition: all var(--ease);
 }
-.mob-nav-btn:hover { background: var(--surface2); color: var(--orange); }
+.mob-nav-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,106,0,0.6); }
 
 /* Sidebar overlay on mobile */
 .sb-overlay {

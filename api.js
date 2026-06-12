@@ -35,7 +35,10 @@ async function apiFetch(path, options = {}) {
   const method  = (options.method || "GET").toUpperCase();
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
   if (method !== "GET" && method !== "HEAD") {
-    const csrf = getCookie("csrf_access_token");
+    // Cross-domain: the CSRF cookie (on the backend domain) isn't readable here,
+    // so we use the value the login response stored in localStorage. Fall back to
+    // the cookie for same-domain setups.
+    const csrf = localStorage.getItem("admin_csrf") || getCookie("csrf_access_token");
     if (csrf) headers["X-CSRF-TOKEN"] = csrf;
   }
   const res  = await fetch(API + path, { credentials: "include", ...options, headers });
