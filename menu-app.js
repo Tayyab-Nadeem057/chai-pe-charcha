@@ -647,21 +647,11 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ── CART ─────────────────────────────────────────────────────
-function openCart()  {
-  document.getElementById('cart-drawer').classList.add('open');
-  document.getElementById('cart-overlay').classList.add('open');
-  renderDrawer();
-}
-function closeCart() {
-  document.getElementById('cart-drawer').classList.remove('open');
-  document.getElementById('cart-overlay').classList.remove('open');
-}
-
-function updateFloatBtn() {
-  const n = Cart.count();
-  document.getElementById('fc-badge').textContent = n;
-  document.getElementById('float-cart').classList.toggle('visible', n > 0);
-}
+// The cart UI now lives in the shared cart.js (works on every page).
+// These delegate to it so the menu's existing calls keep working.
+function openCart()       { if (window.cpcCart) window.cpcCart.open(); }
+function closeCart()      { if (window.cpcCart) window.cpcCart.close(); }
+function updateFloatBtn() { if (window.cpcCart) window.cpcCart.update(); }
 
 function renderDrawer() {
   const items = Cart.get();
@@ -882,19 +872,7 @@ function showServiceBanner() {
   // and refreshes with API data in background if available
   await loadMenuData();
   buildMenu();
-  checkPaymentConfig();
 })();
-
-// Reveal the "Pay Online" option only when the backend has card payment configured.
-async function checkPaymentConfig() {
-  try {
-    const res = await apiFetch('/config');
-    if (res && res.data && res.data.card_payment) {
-      const el = document.getElementById('pay-card-opt');
-      if (el) el.style.display = 'flex';
-    }
-  } catch (_) {}
-}
 
 // ── GLOBAL: addFeatured (used by home.html featured cards) ──────
 // Featured cards are static and have no DB item_id, so they can't be priced
