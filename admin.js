@@ -167,6 +167,8 @@ async function loadOrders() {
   } catch (e) {
     c.innerHTML = `<div class="no-data"><span class="no-data-icon">⚠️</span>
       Failed to load orders. Is the backend running?</div>`;
+    const cards = document.getElementById("order-cards");
+    if (cards) cards.innerHTML = "";
   }
 }
 
@@ -182,8 +184,10 @@ function buildTableSkeleton(rows) {
 
 function renderOrders() {
   const c = document.getElementById("tbl-container");
+  const cards = document.getElementById("order-cards");
   if (!allOrders.length) {
     c.innerHTML = `<div class="no-data"><span class="no-data-icon">📋</span>No orders found.</div>`;
+    if (cards) cards.innerHTML = "";
     return;
   }
   c.innerHTML = `<table>
@@ -214,9 +218,35 @@ function renderOrders() {
     </tbody>
   </table>`;
 
-  c.querySelectorAll("[data-acc]").forEach(b => b.addEventListener("click", () => updateOrder(+b.dataset.acc, "Accepted")));
-  c.querySelectorAll("[data-rej]").forEach(b => b.addEventListener("click", () => updateOrder(+b.dataset.rej, "Rejected")));
-  c.querySelectorAll("[data-detail]").forEach(b => b.addEventListener("click", () => viewOrder(+b.dataset.detail)));
+  // Mobile cards — the table above is hidden on phones via CSS, so phones see these.
+  if (cards) cards.innerHTML = allOrders.map(o => `
+    <div class="order-card">
+      <div class="oc-header">
+        <div><div class="oc-id">#${o.id}</div><div class="oc-time">${timeAgo(o.created_at)}</div></div>
+        <span class="sp sp-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span>
+      </div>
+      <div class="oc-customer">
+        <div class="oc-name">${escapeHtml(o.guest_name)}</div>
+        <div class="oc-phone">${escapeHtml(o.guest_phone)}</div>
+        <div class="oc-address">${escapeHtml(o.delivery_address)}</div>
+      </div>
+      <div class="oc-items">${o.items.map(i => `${escapeHtml(i.item_name)} ×${i.quantity}`).join("<br/>")}</div>
+      <div class="oc-footer">
+        <div class="oc-total">Rs. ${Number(o.total_price) || 0}
+          <div style="font-size:.6rem;font-weight:700;margin-top:2px">${payBadge(o)}</div>
+        </div>
+        <div class="oc-actions">
+          <button class="oc-btn oc-btn-acc ${o.status !== "Pending" ? "oc-btn-dis" : ""}" data-acc="${o.id}">✓ Accept</button>
+          <button class="oc-btn oc-btn-rej ${o.status !== "Pending" ? "oc-btn-dis" : ""}" data-rej="${o.id}">✗ Reject</button>
+          <button class="oc-btn" data-detail="${o.id}" style="background:var(--orange-dim);color:var(--orange);border-color:var(--border-a)">🧾</button>
+        </div>
+      </div>
+    </div>`).join("");
+
+  // Wire actions in BOTH the table and the mobile cards.
+  document.querySelectorAll("#view-orders [data-acc]").forEach(b => b.addEventListener("click", () => updateOrder(+b.dataset.acc, "Accepted")));
+  document.querySelectorAll("#view-orders [data-rej]").forEach(b => b.addEventListener("click", () => updateOrder(+b.dataset.rej, "Rejected")));
+  document.querySelectorAll("#view-orders [data-detail]").forEach(b => b.addEventListener("click", () => viewOrder(+b.dataset.detail)));
 }
 
 function payBadge(o) {
