@@ -30,18 +30,13 @@ function getCookie(name) {
   return m ? decodeURIComponent(m.pop()) : "";
 }
 
-// ── Fetch wrapper: sends cookies + CSRF header on mutating requests ──
+// ── Fetch wrapper: sends the admin token as a Bearer header ──
+// Works cross-domain on every browser (mobile included), unlike cross-site cookies.
 async function apiFetch(path, options = {}) {
-  const method  = (options.method || "GET").toUpperCase();
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
-  if (method !== "GET" && method !== "HEAD") {
-    // Cross-domain: the CSRF cookie (on the backend domain) isn't readable here,
-    // so we use the value the login response stored in localStorage. Fall back to
-    // the cookie for same-domain setups.
-    const csrf = localStorage.getItem("admin_csrf") || getCookie("csrf_access_token");
-    if (csrf) headers["X-CSRF-TOKEN"] = csrf;
-  }
-  const res  = await fetch(API + path, { credentials: "include", ...options, headers });
+  const token = localStorage.getItem("admin_token");
+  if (token) headers["Authorization"] = "Bearer " + token;
+  const res  = await fetch(API + path, { ...options, headers });
   let json;
   try { json = await res.json(); } catch (_) { json = {}; }
   if (!res.ok) throw { status: res.status, message: json.message || "Request failed" };

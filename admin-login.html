@@ -62,31 +62,12 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;
   <div class="warn-badge"><span>&#9888;</span> This page is for authorized staff only</div>
   <div class="err" id="err"></div>
 
-  <!-- LOGIN -->
-  <form id="login-form" onsubmit="doLogin(event)">
+  <form onsubmit="doLogin(event)">
     <div class="fg"><label>Admin Phone</label><input type="tel" id="phone" placeholder="03001234567" required autofocus/></div>
     <div class="fg"><label>Password</label><input type="password" id="pass" placeholder="Enter your password" required/></div>
     <button type="submit" class="btn" id="sbtn">Access Admin Panel</button>
   </form>
-
-  <!-- RESET (hidden until "Forgot password?") -->
-  <div id="reset-box" style="display:none">
-    <div class="fg"><label>Registered Phone</label><input type="tel" id="rp-phone" placeholder="03001234567"/></div>
-    <button type="button" class="btn" id="rp-send" onclick="sendResetCode()">Send WhatsApp Code</button>
-    <div id="rp-step2" style="display:none;margin-top:16px">
-      <div class="fg"><label>6-Digit Code (from WhatsApp)</label><input type="text" id="rp-code" inputmode="numeric" maxlength="6" placeholder="123456"/></div>
-      <div class="fg"><label>New Password</label><input type="password" id="rp-newpass" placeholder="At least 8 characters"/></div>
-      <button type="button" class="btn" id="rp-reset" onclick="submitReset()">Reset Password</button>
-    </div>
-  </div>
-
-  <div class="back-link" id="login-links">
-    <a href="#" onclick="toggleReset(event,true)">Forgot password?</a> &nbsp;&middot;&nbsp;
-    <a href="home.html">Back to Website</a>
-  </div>
-  <div class="back-link" id="reset-links" style="display:none">
-    <a href="#" onclick="toggleReset(event,false)">&larr; Back to login</a>
-  </div>
+  <div class="back-link"><a href="home.html">&larr; Back to Website</a></div>
 </div>
 
 <script src="brand-logo.js"></script>
@@ -126,10 +107,8 @@ async function doLogin(e) {
   btn.textContent = 'Verifying...'; btn.disabled = true;
 
   try {
-    // credentials:'include' lets the server set the httpOnly auth cookie + CSRF cookie.
     const res = await fetch(API + '/auth/login', {
       method: 'POST',
-      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, password: pass })
     });
@@ -137,72 +116,13 @@ async function doLogin(e) {
     if (!res.ok || !json.success) throw new Error(json.message || 'Login failed');
     if (json.data.user.role !== 'admin') throw new Error('Access denied. Admin accounts only.');
 
-    // Only non-sensitive display info in localStorage. The token stays in the cookie.
     localStorage.setItem('admin_user', JSON.stringify(json.data.user));
-    // CSRF token (needed for write actions across domains).
-    if (json.data.csrf) localStorage.setItem('admin_csrf', json.data.csrf);
+    localStorage.setItem('admin_token', json.data.token);
     window.location.href = 'admin-panel.html';
   } catch(ex) {
     err.textContent = ex.message;
     err.classList.add('show');
     btn.textContent = 'Access Admin Panel'; btn.disabled = false;
-  }
-}
-
-// ── Forgot-password (WhatsApp OTP) ──────────────────────────────
-function msg(text, isError) {
-  const err = document.getElementById('err');
-  err.textContent = text;
-  err.style.background = isError ? '' : 'rgba(34,197,94,.12)';
-  err.style.borderColor = isError ? '' : 'rgba(34,197,94,.3)';
-  err.style.color = isError ? '' : '#86efac';
-  err.classList.add('show');
-}
-
-function toggleReset(e, show) {
-  if (e) e.preventDefault();
-  document.getElementById('err').classList.remove('show');
-  document.getElementById('login-form').style.display  = show ? 'none' : '';
-  document.getElementById('reset-box').style.display   = show ? ''     : 'none';
-  document.getElementById('login-links').style.display = show ? 'none' : '';
-  document.getElementById('reset-links').style.display = show ? ''     : 'none';
-  document.getElementById('rp-step2').style.display    = 'none';
-}
-
-async function sendResetCode() {
-  const phone = document.getElementById('rp-phone').value.trim();
-  const btn   = document.getElementById('rp-send');
-  if (!phone) { msg('Please enter your registered phone number.', true); return; }
-  btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    await apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ phone }) });
-    document.getElementById('rp-step2').style.display = '';
-    msg('If that number has an account, a code was sent on WhatsApp. Enter it below.', false);
-  } catch (ex) {
-    msg(ex.message || 'Could not send code.', true);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Resend Code';
-  }
-}
-
-async function submitReset() {
-  const phone = document.getElementById('rp-phone').value.trim();
-  const code  = document.getElementById('rp-code').value.trim();
-  const np    = document.getElementById('rp-newpass').value;
-  const btn   = document.getElementById('rp-reset');
-  if (!code)        { msg('Enter the 6-digit code.', true); return; }
-  if (np.length < 8){ msg('New password must be at least 8 characters.', true); return; }
-  btn.disabled = true; btn.textContent = 'Resetting…';
-  try {
-    await apiFetch('/auth/reset-password', {
-      method: 'POST', body: JSON.stringify({ phone, code, new_password: np })
-    });
-    toggleReset(null, false);
-    msg('Password reset! Log in with your new password.', false);
-  } catch (ex) {
-    msg(ex.message || 'Reset failed.', true);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Reset Password';
   }
 }
 </script>

@@ -11,8 +11,9 @@
 // The JWT lives in an httpOnly cookie (invisible to JS). We keep only
 // non-sensitive display info in localStorage; real auth is enforced by
 // the server on every request (a 401 bounces us to login).
+const token = localStorage.getItem("admin_token");
 const admin = JSON.parse(localStorage.getItem("admin_user") || "null");
-if (!admin || admin.role !== "admin") {
+if (!token || !admin || admin.role !== "admin") {
   location.href = "admin-login.html";
 }
 
@@ -32,7 +33,7 @@ async function adminFetch(path, opts = {}) {
   } catch (e) {
     if (e && e.status === 401) {
       localStorage.removeItem("admin_user");
-      localStorage.removeItem("admin_csrf");
+      localStorage.removeItem("admin_token");
       location.href = "admin-login.html";
     }
     throw new Error((e && e.message) || "Request failed");
@@ -43,7 +44,7 @@ async function adminFetch(path, opts = {}) {
 async function doLogout() {
   try { await apiFetch("/auth/logout", { method: "POST" }); } catch (_) {}
   localStorage.removeItem("admin_user");
-  localStorage.removeItem("admin_csrf");
+  localStorage.removeItem("admin_token");
   location.href = "admin-login.html";
 }
 
@@ -409,12 +410,12 @@ async function processImage(file) {
   fill.style.width = "50%";
 
   try {
-    const csrf = localStorage.getItem("admin_csrf") || getCookie("csrf_access_token");
+    const tok = localStorage.getItem("admin_token");
     const fd = new FormData();
     fd.append("image", file);
     const res = await fetch(API + "/admin/menu/upload", {
-      method: "POST", credentials: "include",
-      headers: csrf ? { "X-CSRF-TOKEN": csrf } : {}, body: fd,
+      method: "POST",
+      headers: tok ? { "Authorization": "Bearer " + tok } : {}, body: fd,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || "Upload failed");
