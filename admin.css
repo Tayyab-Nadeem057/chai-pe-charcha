@@ -7,27 +7,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #080B12;
-  --bg2:       #0E1320;
-  --surface:   #121827;
-  --surface2:  #1A2236;
-  --surface3:  #222E44;
-  --border:    rgba(255,255,255,0.07);
-  --border-a:  rgba(255,106,0,0.22);
+  /* Warm brand palette â€” matches the website & login page */
+  --bg:        #0C0600;
+  --bg2:       #170B02;
+  --surface:   #1B0F05;
+  --surface2:  #271707;
+  --surface3:  #36210C;
+  --border:    rgba(255,138,46,0.12);
+  --border-a:  rgba(255,106,0,0.32);
   --orange:    #FF6A00;
   --orange-l:  #FF9A40;
-  --orange-dim: rgba(255,106,0,0.12);
-  --green:     #22c55e;
-  --green-dim: rgba(34,197,94,0.12);
+  --orange-dim: rgba(255,106,0,0.14);
+  --green:     #34d058;
+  --green-dim: rgba(52,208,88,0.12);
   --red:       #ef4444;
   --red-dim:   rgba(239,68,68,0.12);
-  --yellow:    #f59e0b;
-  --yellow-dim:rgba(245,158,11,0.12);
-  --blue:      #6366f1;
-  --blue-dim:  rgba(99,102,241,0.12);
-  --text:      #EEF2FF;
-  --text-mid:  #94A3B8;
-  --text-muted:#4E6080;
+  --yellow:    #f5a623;
+  --yellow-dim:rgba(245,166,35,0.13);
+  --blue:      #E0A24A;             /* warm gold (was cool indigo) */
+  --blue-dim:  rgba(224,162,74,0.14);
+  --text:      #FFF3E4;
+  --text-mid:  #CBA888;
+  --text-muted:#8C6A49;
   --font:      'Inter', sans-serif;
   --font-serif:'Playfair Display', serif;
   --sidebar-w: 260px;
@@ -42,7 +43,11 @@
 
 html { scroll-behavior: smooth; }
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(1100px 560px at 82% -8%, rgba(255,106,0,0.10), transparent 60%),
+    radial-gradient(820px 480px at -8% 108%, rgba(255,106,0,0.06), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font);
   min-height: 100vh;
@@ -200,7 +205,7 @@ input, select, textarea { font-family: var(--font); }
 .top-bar {
   position: sticky; top: 0; z-index: 100;
   height: var(--header-h);
-  background: rgba(8,11,18,0.85);
+  background: rgba(12,6,0,0.82);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
@@ -251,14 +256,18 @@ input, select, textarea { font-family: var(--font); }
   gap: 14px; margin-bottom: 24px;
 }
 .sc {
-  background: var(--surface);
+  background: linear-gradient(158deg, var(--surface), var(--bg2));
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 20px;
   position: relative; overflow: hidden;
-  transition: transform var(--ease), box-shadow var(--ease);
+  transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
 }
-.sc:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.sc:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.5), 0 0 28px rgba(255,106,0,0.07);
+  border-color: var(--border-a);
+}
 .sc::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -472,7 +481,7 @@ input, select, textarea { font-family: var(--font); }
   font-size: .6rem; padding: 3px 9px; border-radius: 99px;
   font-weight: 700; letter-spacing: .04em;
 }
-.tag-d  { background: var(--blue-dim);   color: #a5b4fc; }
+.tag-d  { background: var(--blue-dim);   color: #f4cf94; }
 .tag-t  { background: var(--green-dim);  color: #86efac; }
 .tag-v  { background: var(--orange-dim); color: var(--orange-l); }
 .tag-off{ background: var(--surface2);   color: var(--text-muted); }
@@ -994,7 +1003,7 @@ input, select, textarea { font-family: var(--font); }
    MOBILE RESPONSIVE OVERRIDES (PATCH)
 ------------------------------------------------------- */
 @media (max-width: 768px) {
-  /* Fix header height — use smaller value on phones */
+  /* Fix header height ï¿½ use smaller value on phones */
   :root { --header-h: 56px; }
 
   .top-bar {
@@ -1018,7 +1027,7 @@ input, select, textarea { font-family: var(--font); }
   .tbl-wrap table { display: none; }
   .order-cards { display: flex; }
 
-  /* Menu toolbar — stack vertically */
+  /* Menu toolbar ï¿½ stack vertically */
   .menu-toolbar { padding: 10px; gap: 8px; }
   .menu-toolbar input,
   .menu-toolbar select {
