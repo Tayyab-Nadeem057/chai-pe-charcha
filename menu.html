@@ -114,6 +114,17 @@
       <div class="cd-section"><label for="cd-phone">Phone</label><input id="cd-phone" placeholder="03021807669" required autocomplete="tel"/></div>
     </div>
     <div class="cd-section"><label for="cd-addr">Delivery Address</label><input id="cd-addr" placeholder="House #, Area, Hyderabad" required autocomplete="street-address"/></div>
+    <div class="cd-section">
+      <label>Payment Method</label>
+      <div id="pay-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--border2,rgba(255,106,0,.25));border-radius:12px;cursor:pointer;font-size:.9rem">
+          <input type="radio" name="paymethod" value="cod" checked/> 💵 Cash on Delivery
+        </label>
+        <label id="pay-card-opt" style="display:none;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--border2,rgba(255,106,0,.25));border-radius:12px;cursor:pointer;font-size:.9rem">
+          <input type="radio" name="paymethod" value="card"/> 💳 Pay Online — Debit / Credit Card (Visa &amp; Mastercard)
+        </label>
+      </div>
+    </div>
     <button class="cd-place-btn" id="cd-place-btn" onclick="placeOrder()">Place Order &#x2192;</button>
   </div>
 </div>

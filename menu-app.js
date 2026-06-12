@@ -766,10 +766,12 @@ async function placeOrder() {
   }
 
   const service = new URLSearchParams(location.search).get('service') || 'delivery';
+  const payEl = document.querySelector('input[name="paymethod"]:checked');
+  const paymentMethod = payEl ? payEl.value : 'cod';
 
   // Disable button immediately
   btn.disabled    = true;
-  btn.textContent = '⏳ Placing order...';
+  btn.textContent = paymentMethod === 'card' ? '⏳ Starting payment...' : '⏳ Placing order...';
 
   // Timeout guard — 12 seconds max
   const timeoutPromise = new Promise((_, reject) =>
@@ -785,6 +787,7 @@ async function placeOrder() {
           phone:            phoneVal,
           delivery_address: addrVal,
           service:          service,
+          payment_method:   paymentMethod,
           items:            validItems
         })
       }),
@@ -800,6 +803,12 @@ async function placeOrder() {
 
     Cart.clear();
     updateFloatBtn();
+
+    // Card payment → redirect to the secure gateway checkout.
+    if (paymentMethod === 'card' && res.data.checkout_url) {
+      window.location.href = res.data.checkout_url;
+      return;
+    }
     showOrderSuccess(res.data.id, res.data.total_price);
 
   } catch (err) {
@@ -873,7 +882,19 @@ function showServiceBanner() {
   // and refreshes with API data in background if available
   await loadMenuData();
   buildMenu();
+  checkPaymentConfig();
 })();
+
+// Reveal the "Pay Online" option only when the backend has card payment configured.
+async function checkPaymentConfig() {
+  try {
+    const res = await apiFetch('/config');
+    if (res && res.data && res.data.card_payment) {
+      const el = document.getElementById('pay-card-opt');
+      if (el) el.style.display = 'flex';
+    }
+  } catch (_) {}
+}
 
 // ── GLOBAL: addFeatured (used by home.html featured cards) ──────
 // Featured cards are static and have no DB item_id, so they can't be priced

@@ -199,7 +199,9 @@ function renderOrders() {
           <div class="addr-cell">${escapeHtml(o.delivery_address)}</div>
         </td>
         <td class="items-cell">${o.items.map(i => `${escapeHtml(i.item_name)} ×${i.quantity}`).join("<br/>")}</td>
-        <td class="price-cell">Rs. ${Number(o.total_price) || 0}</td>
+        <td class="price-cell">Rs. ${Number(o.total_price) || 0}
+          <div style="font-size:.62rem;margin-top:4px;font-weight:700;letter-spacing:.03em">${payBadge(o)}</div>
+        </td>
         <td><span class="sp sp-${escapeHtml(o.status)}" id="pill-${o.id}">${escapeHtml(o.status)}</span></td>
         <td>
           <div class="act-wrap">
@@ -215,6 +217,14 @@ function renderOrders() {
   c.querySelectorAll("[data-acc]").forEach(b => b.addEventListener("click", () => updateOrder(+b.dataset.acc, "Accepted")));
   c.querySelectorAll("[data-rej]").forEach(b => b.addEventListener("click", () => updateOrder(+b.dataset.rej, "Rejected")));
   c.querySelectorAll("[data-detail]").forEach(b => b.addEventListener("click", () => viewOrder(+b.dataset.detail)));
+}
+
+function payBadge(o) {
+  const method = o.payment_method === "card" ? "💳 Card" : "💵 COD";
+  if (o.payment_status === "paid")
+    return `${method} · <span style="color:var(--green)">PAID</span>`;
+  const note = o.payment_method === "card" ? "UNPAID" : "on delivery";
+  return `${method} · <span style="color:var(--text-muted)">${note}</span>`;
 }
 
 function timeAgo(iso) {
@@ -263,6 +273,7 @@ function viewOrder(id) {
     <div class="box">
       <div><strong>Order #${o.id}</strong> &middot; <span class="status">${escapeHtml(o.status)}</span></div>
       <div class="muted">${new Date(o.created_at).toLocaleString()} &middot; ${escapeHtml(o.service || "delivery")}</div>
+      <div class="muted">${o.payment_method === "card" ? "Card payment" : "Cash on Delivery"} &middot; ${o.payment_status === "paid" ? "PAID ✓" : "UNPAID"}</div>
       <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
       <div><strong>${escapeHtml(o.guest_name)}</strong></div>
       <div class="muted">${escapeHtml(o.guest_phone)}</div>
